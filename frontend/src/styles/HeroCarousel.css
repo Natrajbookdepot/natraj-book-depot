@@ -1,0 +1,114 @@
+.carousel-container {
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  overflow: hidden;
+}
+
+.carousel-slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.carousel-slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.carousel-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  max-width: 800px;
+  padding: 0 20px;
+}
+
+.carousel-content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.carousel-content p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.carousel-btn {
+  padding: 12px 24px;
+  background-color: #ffcc00;
+  border: none;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+/* Progress Bar */
+.progress-bar-container {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  display: flex;
+  gap: 6px;
+  transform: translateX(-50%);
+  width: auto;
+  z-index: 2;
+}
+
+.progress-segment {
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+  border-radius: 2px;
+  position: relative;
+}
+
+.progress-segment.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background: #fff;
+  animation: fillBar 5s linear forwards;
+  border-radius: 2px;
+}
+
+@keyframes fillBar {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Responsive Tweaks */
+@media (max-width: 768px) {
+  .carousel-content h2 {
+    font-size: 1.8rem;
+  }
+
+  .carousel-content p {
+    font-size: 0.95rem;
+  }
+
+  .carousel-btn {
+    font-size: 0.9rem;
+  }
+
+  .progress-segment {
+    width: 30px;
+  }
+}
