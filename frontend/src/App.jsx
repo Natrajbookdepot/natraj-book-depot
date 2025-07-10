@@ -1,11 +1,9 @@
-// App.jsx
 import React from 'react';
-import Home from './pages/Home';
 
-const App = () => {
+export default function App() {
   return (
-    <Home />
+    <div className="min-h-screen bg-blue-100 flex items-center justify-center">
+      <h1 className="text-4xl font-bold">Tailwind is Working!</h1>
+    </div>
   );
-};
-
-export default App;
+}
