@@ -1,9 +1,15 @@
-import React from 'react';
+import Navbar from './components/Navbar';
+import { AuthProvider } from './context/AuthContext';
 
-export default function App() {
+function App() {
   return (
-    <div className="min-h-screen bg-blue-100 flex items-center justify-center">
-      <h1 className="text-4xl font-bold">Tailwind is Working!</h1>
-    </div>
+    <AuthProvider>
+      <Navbar />
+      {/* Abhi pages yahan mount karo, simple Home dikhana hai toh */}
+      {/* <Home /> */}
+      {/* Ya baad mein <Routes> dalna hai toh yahan */}
+    </AuthProvider>
   );
 }
+
+export default App;
