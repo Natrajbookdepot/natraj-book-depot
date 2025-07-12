@@ -43,12 +43,16 @@ export default function Navbar() {
           {/* --- Logo --- */}
           <div className="flex-shrink-0 flex items-center gap-2 min-w-[160px]">
             <img src={settings.logoUrl} alt="Logo" className="h-10 w-10 object-contain" />
-            <span className="text-xl font-bold whitespace-nowrap">Natraj Book Depot</span>
+            <span className="
+              font-extrabold font-montserrat text-xl lg:text-2xl tracking-tight text-gray-900 drop-shadow
+            ">
+              {settings.siteName}
+            </span>
           </div>
-          
+
           {/* --- Search + Cart (Desktop/Tablet) --- */}
           <div className="hidden md:flex flex-1 items-center justify-center px-2">
-            <div className="w-full max-w-2xl relative">
+            <div className="w-full max-w-lg relative">
               <input
                 type="text"
                 placeholder="Search..."
@@ -56,14 +60,15 @@ export default function Navbar() {
               />
               <MagnifyingGlassIcon className="w-5 h-5 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
             </div>
-            {/* Cart: after search, before avatar */}
-            <button className="p-2 rounded-full hover:bg-gray-100 transition ml-2" title="Cart">
-              <ShoppingBagIcon className="w-6 h-6 text-gray-700" />
-            </button>
           </div>
 
-          {/* --- Right: Avatar/Hamburger, Cart (mobile), Mobile search --- */}
+          {/* --- Right: Cart (always), Avatar/Login/Hamburger --- */}
           <div className="flex items-center gap-4 min-w-[110px] justify-end">
+            {/* Cart: always visible */}
+            <button className="p-2 rounded-full hover:bg-gray-100 transition" title="Cart">
+              <ShoppingBagIcon className="w-6 h-6 text-gray-700" />
+            </button>
+
             {/* Mobile Only: Magnify icon to open search */}
             <button
               className="md:hidden p-2 rounded-full hover:bg-gray-100 transition"
@@ -71,11 +76,6 @@ export default function Navbar() {
               onClick={() => setShowMobileSearch(v => !v)}
             >
               <MagnifyingGlassIcon className="h-6 w-6" />
-            </button>
-
-            {/* Mobile Only: Cart */}
-            <button className="md:hidden p-2 rounded-full hover:bg-gray-100 transition" title="Cart">
-              <ShoppingBagIcon className="w-6 h-6 text-gray-700" />
             </button>
 
             {/* If not logged in: Hamburger (mobile) + Login/Create (desktop only) */}

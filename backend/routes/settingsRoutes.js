@@ -1,25 +1,16 @@
 const router = require('express').Router();
+const Settings = require('../models/settingsModel');
 
-const settings = {
-  logoUrl: '/images/logo.png',
-  navLinks: [
-    { label: 'Home',    path: '/' },
-    { label: 'Shop',    path: '/shop' },
-    { label: 'About',   path: '/about' },
-    { label: 'Contact', path: '/contact' }
-  ],
-  footer: {
-    description: 'Delivering trusted educational and office supplies with competitive pricing, fast service, and 25+ years of excellence.',
-    contact: {
-      phone: '+91-9936779243',
-      email: 'bookdepotnatraj@gmail.com',
-      hours: 'Mon–Sun 9am–9pm'
+router.get('/', async (req, res) => {
+  try {
+    const settings = await Settings.findOne();
+    if (!settings) {
+      return res.status(404).json({ error: 'Settings not found' });
     }
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch settings', details: err.message });
   }
-};
-
-router.get('/', (_req, res) => {
-  res.json(settings);
 });
 
 module.exports = router;
