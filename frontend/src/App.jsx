@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
 import Home from './pages/Home';
+import Categories from './pages/Categories'; // <-- New: Import Categories page
 
 function App() {
   return (
@@ -12,8 +13,15 @@ function App() {
           <Navbar />
           <div className="flex-1">
             <Routes>
+              {/* Home page */}
               <Route path="/" element={<Home />} />
-              {/* future: <Route path="/about" element={<About />} /> */}
+
+              {/* All Categories grid page */}
+              <Route path="/categories" element={<Categories />} />
+
+              {/* TODO: Add more pages below as you build */}
+              {/* <Route path="/about" element={<About />} /> */}
+              {/* <Route path="/category/:slug" element={<CategoryDetail />} /> */}
             </Routes>
           </div>
           <Footer />
@@ -22,4 +30,5 @@ function App() {
     </AuthProvider>
   );
 }
+
 export default App;

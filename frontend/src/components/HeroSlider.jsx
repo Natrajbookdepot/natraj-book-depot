@@ -7,34 +7,34 @@ import "swiper/css/autoplay";
 import "swiper/css/pagination";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-// Optionally pass logoUrl as prop (else set your logo url below)
-const LOGO_URL = "/logo.png"; // <-- Put your logo path here (public folder etc)
+const LOGO_URL = "/images/logo.png"; // <-- Make sure this path is correct in public!
 
 export default function HeroSlider() {
   const [banners, setBanners] = useState([]);
   const videoRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     axios.get(`${API_URL}/api/herobanners`)
       .then(res => setBanners(res.data))
-      .catch(() => setBanners([]));
+      .catch(() => setBanners([]))
+      .finally(() => setLoading(false));
   }, []);
 
   const isVideoSlide = (banner) => banner.type === "video";
   const AUTOPLAY_DELAY = 7000;
 
   // --- Loading state skeleton ---
-  if (!banners || banners.length === 0) {
+  if (loading || !banners || banners.length === 0) {
     return (
-      <div className="apple-hero-slider relative w-full h-[60vw] max-h-[520px] bg-gray-100 flex items-center justify-center animate-pulse">
-        {/* Centered logo (grey shade) */}
+      <div className="apple-hero-slider relative w-full h-[60vw] max-h-[520px] bg-gray-100 flex flex-col items-center justify-center animate-pulse">
         <img
           src={LOGO_URL}
           alt="Logo"
-          className="h-16 w-16 object-contain opacity-80"
+          className="h-16 w-16 object-contain opacity-80 mb-3"
           style={{ filter: "grayscale(1)" }}
         />
+        <span className="text-gray-400 text-lg font-medium tracking-wider">Loading ...</span>
       </div>
     );
   }
