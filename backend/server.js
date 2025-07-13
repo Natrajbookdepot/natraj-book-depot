@@ -18,10 +18,17 @@ app.use(express.json());
 // Serve your logo and any other images placed in frontend/public/images
 app.use('/images', express.static(path.join(__dirname, '../frontend/public/images')));
 
+// ─── Uploads (Hero Banner Images/Videos) ───────────────────────────────────────
+// Serve video/image files for hero section (completely dynamic, DB-driven)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // ─── Settings Route ─────────────────────────────────────────────────────────────
 app.use('/api/settings', require('./routes/settingsRoutes'));
 
-// ─── Default Test Route ────────────────────────────────────────────────────────
+// ─── HeroBanner Route ───────────────────────────────────────────────────────────
+app.use('/api/herobanners', require('./routes/herobannerRoutes'));
+
+// ─── Default Test Route ─────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
   res.send('✅ Natraj Book Depot API running!');
 });
