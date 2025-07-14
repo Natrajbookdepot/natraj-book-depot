@@ -23,6 +23,9 @@ app.use('/api/herobanners', require('./routes/herobannerRoutes'));
 // ─── Category Route ─────────────────────────────────────────────────────────────
 app.use('/api/categories', require('./routes/categoryRoutes')); // ADD THIS LINE
 
+// ─── Product Route ─────────────────────────────────────────────────────────────
+app.use('/api/products', require('./routes/productRoutes')); // ADD THIS LINE
+
 // ─── Default Test Route ─────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
   res.send('✅ Natraj Book Depot API running!');
