@@ -1,6 +1,6 @@
 const Product = require('../models/productModel');
 
-// GET /api/products?category=notebooks&subcategory=Drawing%20Books&min=50&max=200
+// GET multiple products (by category, subcategory, price, etc.)
 exports.getProducts = async (req, res) => {
   try {
     const { category, subcategory, min, max, sort } = req.query;
@@ -24,5 +24,21 @@ exports.getProducts = async (req, res) => {
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: "Server error: " + err.message });
+  }
+};
+
+// GET a single product by slug
+exports.getProduct = async (req, res) => {
+  try {
+    const { slug } = req.params;  // Get the slug from the URL
+    const product = await Product.findOne({ slug });
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.json(product);  // Return the single product data
+  } catch (err) {
+    res.status(500).json({ error: 'Server error: ' + err.message });
   }
 };
