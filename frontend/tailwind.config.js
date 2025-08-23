@@ -7,6 +7,8 @@ module.exports = {
     extend: {
       fontFamily: {
   montserrat: ['Montserrat', 'sans-serif'],
+  sans: ["Poppins", "ui-sans-serif", "system-ui"],
+  
 },
 
     },

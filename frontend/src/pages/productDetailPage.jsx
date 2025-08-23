@@ -1,103 +1,135 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import clsx from "clsx";
+
+import LogoLoader from "../components/LogoLoader";
+import ProductImageGallery from "../components/ProductImageGallery";
+import RatingStars from "../components/RatingStars";
 import CustomerReviews from "../components/customerReviews";
 import RelatedProducts from "../components/RelatedProducts";
-import '../styles/productDetailPage.css';  // Make sure this CSS is included
 
-const ProductDetailPage = () => {
-  const { slug } = useParams();  // Get product slug from the URL
+/* ───────────────────────────────────────── Tab switcher (quick stub)
+   • Keeps the first button active (“Description”) for now.
+   • Wire up state later if you want real tabs.                      */
+const TabButtons = () => (
+  <div className="flex gap-8">
+    <button className="px-6 py-3 border-b-2 border-sky-600 font-semibold">
+      Description
+    </button>
+    <button className="px-6 py-3 text-gray-500">Specifications</button>
+    <button className="px-6 py-3 text-gray-500">Reviews</button>
+  </div>
+);
+
+export default function ProductDetailPage() {
+  const { slug } = useParams();
   const [product, setProduct] = useState(null);
-  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [related, setRelated] = useState([]);
 
-  // Fetch product data
+  /* ─────────────── Fetch product */
   useEffect(() => {
-    const fetchProduct = async () => {
-      const response = await axios.get(`/api/products/${slug}`);
-      setProduct(response.data);
-    };
+    axios.get(`/api/products/${slug}`).then(({ data }) => setProduct(data));
+  }, [slug]);
 
-    const fetchRelatedProducts = async () => {
-      const response = await axios.get(`/api/products?category=${product?.categorySlug}`);
-      setRelatedProducts(response.data);
-    };
+  /* ─────────────── Fetch related when product arrives */
+  useEffect(() => {
+    if (!product) return;
+    axios
+      .get(`/api/products?category=${product.categorySlug}`)
+      .then(({ data }) => setRelated(data.filter((p) => p._id !== product._id)));
+  }, [product]);
 
-    fetchProduct();
-  }, [slug, product?.categorySlug]);
+  /* ─────────────── Loading state */
+  if (!product) return <LogoLoader text="Loading product…" />;
 
-  if (!product) return <div>Loading...</div>;
-
-  // Default image in case of missing image in the DB
-  const defaultImage = "/public/category/notebooks.jpg";
-
+  /* ─────────────── Render */
   return (
-    <div className="product-detail-container">
-      {/* Product Title */}
-      <h1 className="product-title">{product.title}</h1>
+    <section className="max-w-[1280px] mx-auto px-4 lg:px-8 py-10 font-sans">
+      {/* ───── GRID (gallery + info) */}
+      <div className="grid gap-14 lg:grid-cols-[500px_minmax(0,1fr)]">
+        {/* GALLERY */}
+        <ProductImageGallery
+          images={product.images.map((i) => `http://localhost:5000${i}`)}
+          title={product.title}
+        />
 
-      {/* Image Gallery */}
-      <div className="product-image-gallery">
-        <div className="main-product-image-container">
-          <img
-            src={`http://localhost:5000${product.images[0] || defaultImage}`}
-            alt={product.title}
-            className="main-product-image"
-          />
-        </div>
-        <div className="thumbnail-images">
-          {product.images.length > 0 ? (
-            product.images.map((image, index) => (
-              <img
-                key={index}
-                src={`http://localhost:5000${image}`}
-                alt={`${product.title} thumbnail ${index}`}
-                className="thumbnail-image"
-                onClick={() => setMainImage(image)}
-              />
-            ))
-          ) : (
-            <img
-              src={defaultImage}
-              alt="Default product"
-              className="thumbnail-image"
-            />
-          )}
+        {/* INFO PANEL */}
+        <div className="flex flex-col gap-6">
+          {/* Title */}
+          <h1 className="text-2xl lg:text-3xl font-semibold leading-tight">
+            {product.title}
+          </h1>
+
+          {/* Price strip */}
+          <div className="flex items-end gap-3">
+            <span className="text-3xl lg:text-4xl font-extrabold text-rose-600">
+              ₹{product.price}
+            </span>
+            <span className="line-through text-gray-400 text-lg">
+              ₹{Math.round(product.price * 1.25)}
+            </span>
+            <span className="text-green-700 font-medium">20 % OFF</span>
+          </div>
+
+          {/* Rating */}
+          <div className="flex items-center gap-2">
+            <RatingStars value={product.ratings} />
+            <span className="text-sm text-gray-500">
+              {product.ratings.toFixed(1)} / 5
+            </span>
+          </div>
+
+          {/* Description */}
+          <p className="text-gray-700 leading-relaxed">{product.description}</p>
+
+          {/* Stock + CTAs */}
+          <div className="flex items-center gap-2">
+            <span
+              className={clsx(
+                "text-sm font-medium",
+                product.inStock ? "text-emerald-600" : "text-red-600"
+              )}
+            >
+              {product.inStock ? "In Stock" : "Out of Stock"}
+            </span>
+          </div>
+
+          <div className="flex gap-4 mt-1">
+            <button
+              disabled={!product.inStock}
+              className="w-1/2 btn-primary"
+            >
+              Add to Cart
+            </button>
+            <button
+              disabled={!product.inStock}
+              className="w-1/2 btn-secondary"
+            >
+              Buy Now
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Product Info */}
-      <div className="product-info">
-        <p className="product-description">{product.description}</p>
-        <p className="product-price">₹{product.price}</p>
-        <p className="product-rating">Rating: {product.ratings} / 5</p>
-        <p className="product-stock">{product.inStock ? "In Stock" : "Out of Stock"}</p>
-
-        {/* Action Buttons */}
-        <div className="action-buttons">
-          <button
-            disabled={!product.inStock}
-            className="add-to-cart-btn"
-            onClick={() => handleAddToCart(product)}
-          >
-            Add to Cart
-          </button>
-          <button
-            disabled={!product.inStock}
-            className="buy-now-btn"
-            onClick={() => handleBuyNow(product)}
-          >
-            Buy Now
-          </button>
-        </div>
+      {/* ───── Tabs */}
+      <div className="mt-16 border-b border-gray-200">
+        <TabButtons />
       </div>
 
-      {/* Customer Reviews Section */}
-      <CustomerReviews productId={product._id} />
+      {/* ───── Reviews (static “Description” content first) */}
+      <p className="mt-6 leading-relaxed text-gray-800">
+        {product.description}
+      </p>
 
-      {/* Related Products Section */}
-      <RelatedProducts products={relatedProducts} />
-    </div>
+      <div className="mt-12">
+        <CustomerReviews productId={product._id} />
+      </div>
+
+      {/* ───── Related */}
+      <div className="mt-20">
+        <RelatedProducts products={related.slice(0, 6)} />
+      </div>
+    </section>
   );
-};
-
-export default ProductDetailPage;
+}
