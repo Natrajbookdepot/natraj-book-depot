@@ -15,6 +15,9 @@ app.use(express.json());
 // ─── Static Assets ─────────────────────────────────────────────────────────────
 // Serve images from frontend/public/images/ and backend/uploads/ directories
 app.use('/category', express.static(path.join(__dirname, '../frontend/public/category')));
+// WRONG (case error):
+// app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
+// RIGHT:
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── Settings Route ─────────────────────────────────────────────────────────────
