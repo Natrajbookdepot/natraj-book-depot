@@ -18,8 +18,9 @@ export default function RelatedProducts({ products }) {
   const navigate = useNavigate();
 
   return (
-    <div>
-      <h3 className="font-bold text-lg mb-2">Related Products</h3>
+    <div className="mt-28">
+      <hr />
+      <h3 className="font-semibold text-2xl mb-4 underline">Related Products</h3>
       <div className="
         flex flex-wrap justify-center gap-6
       ">
