@@ -31,12 +31,14 @@ export default function CustomerReviews({ productId }) {
 
   return (
     <div className="rounded-xl border shadow p-4 sm:p-6 bg-white w-full max-w-3xl mx-auto">
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        {/* Left: Average + form */}
-        <div className="flex flex-col gap-2 md:w-1/3 items-center md:items-start">
-          <div className="flex items-center gap-2">
-            <span className="text-3xl font-bold text-sky-700">{avg}</span>
-            <RatingStars value={Number(avg)} />
+      <div className="flex flex-col md:flex-row md:gap-10">
+        {/* Left: Rating summary and form */}
+        <div className="md:w-[340px] flex flex-col items-center md:items-start mb-6 md:mb-0">
+          <div className="flex flex-col items-center md:items-start mb-2">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-3xl font-bold text-sky-700">{avg}</span>
+              <RatingStars value={Number(avg)} />
+            </div>
             <span className="text-gray-400 font-medium text-base">
               ({reviews.length} review{reviews.length !== 1 ? "s" : ""})
             </span>
@@ -83,8 +85,8 @@ export default function CustomerReviews({ productId }) {
             </button>
           </form>
         </div>
-        {/* Right: Reviews list */}
-        <div className="flex-1 w-full mt-4 md:mt-0 md:ml-8">
+        {/* Right: Review list */}
+        <div className="flex-1 w-full">
           <div className="space-y-4">
             {reviews.length === 0 && (
               <div className="text-gray-500 text-center mb-2">No reviews yet.</div>
@@ -92,22 +94,19 @@ export default function CustomerReviews({ productId }) {
             {reviews.slice(0, 5).map((r) => (
               <div
                 key={r._id}
-                className="bg-sky-50 px-4 py-3 rounded-lg flex flex-col md:flex-row md:items-center md:gap-4"
+                className="bg-sky-50 px-4 py-3 rounded-lg flex flex-col"
               >
-                <div className="flex-1">
-                  <div className="flex gap-2 items-center font-semibold text-sky-900">
-                    <span>{r.user}</span>
-                    <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center gap-1 my-1">
-                    <RatingStars value={Number(r.rating)} />
-                    <span className="text-sm text-gray-700">{r.rating} / 5</span>
-                  </div>
-                  <p className="text-gray-700 text-base break-words whitespace-pre-line max-w-full" style={{wordBreak:"break-word"}}>
-  {r.comment}
-</p>
-
+                <div className="flex gap-2 items-center font-semibold text-sky-900">
+                  <span>{r.user}</span>
+                  <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</span>
                 </div>
+                <div className="flex items-center gap-1 my-1">
+                  <RatingStars value={Number(r.rating)} />
+                  <span className="text-sm text-gray-700">{r.rating} / 5</span>
+                </div>
+                <p className="text-gray-700 text-base break-words whitespace-pre-line max-w-full" style={{wordBreak:"break-word"}}>
+                  {r.comment}
+                </p>
               </div>
             ))}
           </div>

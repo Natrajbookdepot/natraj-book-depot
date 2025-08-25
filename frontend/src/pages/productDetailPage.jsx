@@ -16,7 +16,7 @@ const GRADIENTS = [
   "linear-gradient(135deg, #ffd7e9 0%, #ffbab3 100%)",
   "linear-gradient(135deg, #fffdeb 0%, #c5ee92 100%)",
   "linear-gradient(135deg, #cffafe 0%, #818cf8 100%)",
-  "linear-gradient(135deg, #fbc1cc 0%, #fcf8f3 100%)"
+  "linear-gradient(135deg, #fbc1cc 0%, #fcf8f3 100%)",
 ];
 
 export default function ProductDetail() {
@@ -35,7 +35,9 @@ export default function ProductDetail() {
     if (!product) return;
     axios
       .get(`/api/products?category=${product.categorySlug}`)
-      .then(({ data }) => setRelated(data.filter((p) => p._id !== product._id)));
+      .then(({ data }) =>
+        setRelated(data.filter((p) => p._id !== product._id))
+      );
   }, [product]);
 
   if (!product) return <LogoLoader text="Loading product…" />;
@@ -54,7 +56,7 @@ export default function ProductDetail() {
       </div>
 
       {/* Main Grid */}
-      <div className="grid gap-14 lg:grid-cols-[500px_minmax(0,1fr)]">
+      <div className="grid gap-4 lg:grid-cols-[500px_minmax(0,1fr)]">
         <ProductImageGallery
           images={product.images?.map((img) =>
             img.startsWith("http") ? img : `http://localhost:5000${img}`
@@ -63,9 +65,15 @@ export default function ProductDetail() {
         />
 
         <div className="flex flex-col gap-6">
-          <h1 className="text-2xl lg:text-3xl font-semibold leading-tight">
+          <h1 className="text-xl lg:text-2xl font-semibold leading-tight">
             {product.title}
           </h1>
+
+          {/* Rating summary */}
+          <div className="flex items-center gap-2">
+            <RatingStars value={product.ratings} />
+            <span className="text-gray-500">{product.ratings.toFixed(1)}</span>
+          </div>
 
           {/* Price and discount */}
           <div className="flex items-end gap-3">
@@ -78,12 +86,6 @@ export default function ProductDetail() {
             <span className="text-green-700 font-medium">20% OFF</span>
           </div>
 
-          {/* Rating summary */}
-          <div className="flex items-center gap-2">
-            <RatingStars value={product.ratings} />
-            <span className="text-gray-500">{product.ratings.toFixed(1)}</span>
-          </div>
-
           {/* Short description */}
           <p className="text-gray-700">{product.description}</p>
 
@@ -91,7 +93,7 @@ export default function ProductDetail() {
           <div>
             <span
               className={clsx(
-                "text-sm font-medium",
+                "text-sm font-medium bg-green-100 px-2 rounded",
                 product.inStock ? "text-green-700" : "text-red-600"
               )}
             >
@@ -100,7 +102,7 @@ export default function ProductDetail() {
           </div>
 
           {/* Action buttons */}
-          <div className="flex gap-4">
+          <div className="flex gap-4 w-80">
             <button
               disabled={!product.inStock}
               className="flex-1 rounded bg-sky-600 py-3 text-white hover:bg-sky-700 disabled:opacity-50"
@@ -118,7 +120,7 @@ export default function ProductDetail() {
       </div>
 
       {/* Tabs */}
-      <div className="mt-12 border-b border-gray-200 flex space-x-8 text-lg font-semibold text-gray-700">
+      <div className="mt-12 border-b border-gray-200 flex space-x-8 text-m font-medium text-gray-500">
         <button
           onClick={() => setTab("desc")}
           className={`pb-3 ${
@@ -156,13 +158,19 @@ export default function ProductDetail() {
         {tab === "desc" && (
           <div className="flex flex-col md:flex-row items-start gap-8">
             <img
-              src={product.images?.length ? `http://localhost:5000${product.images[0]}` : "/category/default.jpg"}
+              src={
+                product.images?.length
+                  ? `http://localhost:5000${product.images[0]}`
+                  : "/category/default.jpg"
+              }
               alt={product.title}
               className="w-full max-w-[320px] rounded shadow-md md:sticky md:top-20 object-contain"
               style={{ minHeight: "350px", background: "#fff" }}
             />
             <div className="flex-grow">
-              <h2 className="text-xl font-semibold mb-3">Product Description</h2>
+              <h2 className="text-lg font-medium mb-3 underline underline-offset-4">
+                Product Description
+              </h2>
               <p className="text-gray-700">{product.description}</p>
             </div>
           </div>
@@ -170,10 +178,19 @@ export default function ProductDetail() {
 
         {tab === "specs" && (
           <ul className="list-disc px-5 py-3 text-gray-700 max-w-lg">
-            <li><b>Brand:</b> {product.brand || "N/A"}</li>
-            <li><b>Type:</b> {product.subcategoryName || "N/A"}</li>
-            <li><b>Price:</b> ₹{product.price}</li>
-            <li><b>Availability:</b> {product.inStock ? "In Stock" : "Out of Stock"}</li>
+            <li>
+              <b>Brand:</b> {product.brand || "N/A"}
+            </li>
+            <li>
+              <b>Type:</b> {product.subcategoryName || "N/A"}
+            </li>
+            <li>
+              <b>Price:</b> ₹{product.price}
+            </li>
+            <li>
+              <b>Availability:</b>{" "}
+              {product.inStock ? "In Stock" : "Out of Stock"}
+            </li>
           </ul>
         )}
 
