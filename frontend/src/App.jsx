@@ -3,7 +3,9 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
 import Home from './pages/Home';
-import Categories from './pages/Categories'; // <-- New: Import Categories page
+import Categories from './pages/categories'; // <-- All Categories grid page
+import CategoryProducts from './pages/CategoryProducts'; // <-- Category Products Page
+import ProductDetailPage from './pages/productDetailPage'; // <-- Import ProductDetailPage
 
 function App() {
   return (
@@ -19,9 +21,14 @@ function App() {
               {/* All Categories grid page */}
               <Route path="/categories" element={<Categories />} />
 
+              {/* Category Product List Page (Dynamic) */}
+              <Route path="/category/:slug" element={<CategoryProducts />} />
+
+              {/* Product Detail Page */}
+              <Route path="/product/:slug" element={<ProductDetailPage />} /> {/* <-- Add this line */}
+
               {/* TODO: Add more pages below as you build */}
               {/* <Route path="/about" element={<About />} /> */}
-              {/* <Route path="/category/:slug" element={<CategoryDetail />} /> */}
             </Routes>
           </div>
           <Footer />

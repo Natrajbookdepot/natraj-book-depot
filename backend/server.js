@@ -13,7 +13,11 @@ app.use(cors());
 app.use(express.json());
 
 // ─── Static Assets ─────────────────────────────────────────────────────────────
-app.use('/images', express.static(path.join(__dirname, '../frontend/public/images')));
+// Serve images from frontend/public/images/ and backend/uploads/ directories
+app.use('/category', express.static(path.join(__dirname, '../frontend/public/category')));
+// WRONG (case error):
+// app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
+// RIGHT:
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── Settings Route ─────────────────────────────────────────────────────────────
@@ -21,7 +25,13 @@ app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/herobanners', require('./routes/herobannerRoutes'));
 
 // ─── Category Route ─────────────────────────────────────────────────────────────
-app.use('/api/categories', require('./routes/categoryRoutes')); // ADD THIS LINE
+app.use('/api/categories', require('./routes/categoryRoutes'));
+
+// ─── Product Route ─────────────────────────────────────────────────────────────
+app.use('/api/products', require('./routes/productRoutes'));
+
+// ─── Review Route ─────────────────────────────────────────────────────────────
+app.use('/api/reviews', require('./routes/ReviewRoutes')); // ADD THIS LINE
 
 // ─── Default Test Route ─────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
