@@ -1,36 +1,51 @@
-﻿import React, { createContext, useContext, useState, useEffect } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Loading state for user fetch
 
-  // Check localStorage for user on mount
+  // Try auto-fetch user on mount
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const profile = localStorage.getItem("profile");
-    if (token && profile) {
-      setUser(JSON.parse(profile));
-    }
+    setLoading(true);
+    axios
+      .get("/api/auth/me", { withCredentials: true })
+      .then((res) => setUser(res.data.user))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
   }, []);
 
-  // Dummy login/logout (replace with API later)
-  const login = (profile) => {
-    localStorage.setItem("token", "dummy-jwt");
-    localStorage.setItem("profile", JSON.stringify(profile));
-    setUser(profile);
+  const login = async (credentials) => {
+    const { data } = await axios.post("/api/auth/login", credentials, { withCredentials: true });
+    setUser(data.user);
+    return data;
   };
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("profile");
+
+  const logout = async () => {
+    await axios.post("/api/auth/logout", {}, { withCredentials: true });
     setUser(null);
   };
 
+  const register = async (payload) => {
+    const { data } = await axios.post("/api/auth/register", payload, { withCredentials: true });
+    return data; // { userId }
+  };
+
+  const verifyOTP = async (userId, otp) => {
+    const { data } = await axios.post("/api/auth/verify-otp", { userId, otp }, { withCredentials: true });
+    setUser(data.user);
+    return data;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, register, verifyOTP }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => useContext(AuthContext);
+export function useAuth() {
+  return useContext(AuthContext);
+}
