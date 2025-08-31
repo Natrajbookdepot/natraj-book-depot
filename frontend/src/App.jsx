@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Categories from "./pages/categories"; 
 import CategoryProducts from "./pages/CategoryProducts";
 import ProductDetailPage from "./pages/productDetailPage";
+import WishlistPage from './pages/WishlistPage'; 
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
@@ -23,6 +24,7 @@ function App() {
               <Route path="/product/:slug" element={<ProductDetailPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+               <Route path="/wishlist" element={<WishlistPage />} />
             </Routes>
           </div>
           <Footer />

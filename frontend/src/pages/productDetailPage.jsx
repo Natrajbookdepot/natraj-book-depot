@@ -14,12 +14,11 @@ import { useAuth } from "../context/AuthContext";
 export default function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { user, showAuthModal } = useAuth();
+  const { user, showAuthModal, wishlist, addToWishlist, removeFromWishlist } = useAuth();
 
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
   const [tab, setTab] = useState("desc");
-  const [wishlisted, setWishlisted] = useState(false);
 
   useEffect(() => {
     axios.get(`/api/products/${slug}`).then(({ data }) => setProduct(data));
@@ -27,49 +26,27 @@ export default function ProductDetail() {
 
   useEffect(() => {
     if (!product) return;
-    axios
-      .get(`/api/products?category=${product.categorySlug}`)
-      .then(({ data }) => setRelated(data.filter((p) => p._id !== product._id)));
+    axios.get(`/api/products?category=${product.categorySlug}`).then(({ data }) => {
+      setRelated(data.filter((p) => p._id !== product._id));
+    });
   }, [product]);
 
-  useEffect(() => {
-    if (!user || !product) {
-      setWishlisted(false);
-      return;
-    }
-    axios
-      .get("/api/wishlist", {
-        headers: { "X-User-Id": user._id },
-      })
-      .then((res) => {
-        setWishlisted(res.data.some((item) => item._id === product._id));
-      })
-      .catch(() => setWishlisted(false));
-  }, [user, product]);
+  const isWishlisted = wishlist.some(item => item._id === product?._id);
 
+  // Handle wishlist toggle using context methods for real-time syncing
   const toggleWishlist = async () => {
     if (!user) {
       showAuthModal();
       return;
     }
     try {
-      if (!wishlisted) {
-        await axios.post(
-          "/api/wishlist/add",
-          { productId: product._id },
-          { headers: { "X-User-Id": user._id } }
-        );
-        setWishlisted(true);
+      if (!isWishlisted) {
+        await addToWishlist(product._id);
       } else {
-        await axios.post(
-          "/api/wishlist/remove",
-          { productId: product._id },
-          { headers: { "X-User-Id": user._id } }
-        );
-        setWishlisted(false);
+        await removeFromWishlist(product._id);
       }
     } catch (error) {
-      // handle error if needed
+      // handle error
     }
   };
 
@@ -80,20 +57,20 @@ export default function ProductDetail() {
       <div className="mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center rounded-full bg-white shadow-md p-2 border border-gray-100 hover:shadow-lg transition"
+          className="flex items-center rounded-full bg-white shadow-md p-2 border border-gray-100"
           aria-label="Go back"
         >
-          <ArrowLeft size={24} />
+          <ArrowLeft />
         </button>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[500px_minmax(0,1fr)]">
         <ProductImageGallery
-  images={product.images?.map((img) =>
-    img.startsWith("http") ? img : `http://localhost:5000${img}`
-  )}
-  title={product.title}
-/>
+          images={product.images?.map((img) =>
+            img.startsWith("http") ? img : `http://localhost:5000${img}`
+          )}
+          title={product.title}
+        />
 
         <div className="flex flex-col gap-6">
           <h1 className="text-xl lg:text-2xl font-semibold">{product.title}</h1>
@@ -104,8 +81,8 @@ export default function ProductDetail() {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold text-rose-600">{`₹${product.price}`}</span>
-            <span className="line-through text-gray-400">{`₹${Math.round(product.price * 1.25)}`}</span>
+            <span className="text-3xl font-bold text-rose-600">₹{product.price}</span>
+            <span className="line-through text-gray-400">₹{Math.round(product.price * 1.25)}</span>
             <span className="text-green-600">20% OFF</span>
           </div>
 
@@ -114,32 +91,33 @@ export default function ProductDetail() {
           <div className="flex items-center gap-3">
             <span
               className={clsx(
-                "text-sm font-medium px-2 py-1 rounded bg-green-100",
-                product.inStock ? "text-green-700" : "text-red-700"
+                "text-sm font-medium px-2 py-1",
+                product.inStock ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700",
+                "rounded"
               )}
             >
               {product.inStock ? "In Stock" : "Out of Stock"}
             </span>
 
             <button
-              aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+              aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
               onClick={toggleWishlist}
-              className="p-1 rounded-full transition hover:bg-gray-100"
+              className="p-1"
             >
               <Heart
                 size={24}
-                fill={wishlisted ? "red" : "none"}
-                stroke={wishlisted ? "red" : "currentColor"}
+                fill={isWishlisted ? "red" : "none"}
+                stroke={isWishlisted ? "red" : "currentColor"}
                 className="cursor-pointer"
               />
             </button>
           </div>
 
           <div className="flex gap-4 w-80">
-            <button disabled={!product.inStock} className="flex-1 btn-primary">
+            <button disabled={!product.inStock} className="btn-primary flex-1">
               Add to Cart
             </button>
-            <button disabled={!product.inStock} className="flex-1 btn-secondary">
+            <button disabled={!product.inStock} className="btn-secondary flex-1">
               Buy Now
             </button>
           </div>
