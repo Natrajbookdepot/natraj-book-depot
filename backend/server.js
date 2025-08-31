@@ -1,5 +1,3 @@
-// backend/server.js
-
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -14,14 +12,38 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
+
 // ─── Static Assets ─────────────────────────────────────────────────────────────
-// Serve your logo and any other images placed in frontend/public/images
-app.use('/images', express.static(path.join(__dirname, '../frontend/public/images')));
+// Serve images from frontend/public/images/ and backend/uploads/ directories
+app.use('/category', express.static(path.join(__dirname, '../frontend/public/category')));
+// WRONG (case error):
+// app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
+// RIGHT:
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── Settings Route ─────────────────────────────────────────────────────────────
 app.use('/api/settings', require('./routes/settingsRoutes'));
+app.use('/api/herobanners', require('./routes/herobannerRoutes'));
 
-// ─── Default Test Route ────────────────────────────────────────────────────────
+// ─── Category Route ─────────────────────────────────────────────────────────────
+app.use('/api/categories', require('./routes/categoryRoutes'));
+
+// ─── Product Route ─────────────────────────────────────────────────────────────
+app.use('/api/products', require('./routes/productRoutes'));
+
+// ─── Review Route ─────────────────────────────────────────────────────────────
+app.use('/api/reviews', require('./routes/ReviewRoutes')); // ADD THIS LINE
+
+// ─── Wishlist Route ────────────────────────────────────────────────────────────
+app.use('/api/wishlist', require('./routes/wishlistRoutes'));
+
+// ─── Auth Route ────────────────────────────────────────────────────────────────
+app.use("/api/auth", require("./routes/authRoutes"));
+
+// ─── Default Test Route ─────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
   res.send('✅ Natraj Book Depot API running!');
 });

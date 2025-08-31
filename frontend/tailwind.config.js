@@ -7,10 +7,12 @@ module.exports = {
     extend: {
       fontFamily: {
   montserrat: ['Montserrat', 'sans-serif'],
+  sans: ["Poppins", "ui-sans-serif", "system-ui"],
+  
 },
 
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/line-clamp')],
 }
 

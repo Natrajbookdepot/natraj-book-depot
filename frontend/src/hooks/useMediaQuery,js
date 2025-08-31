@@ -1,0 +1,26 @@
+const isMobile = window.innerWidth < 768; // (Or useMediaQuery for more dynamic)
+const [filterOpen, setFilterOpen] = useState(false);
+
+const [sort, setSort] = useState("");
+const [minPrice, setMinPrice] = useState(10);   // Get actual min from your products data if dynamic
+const [maxPrice, setMaxPrice] = useState(2000);
+const [curMin, setCurMin] = useState(minPrice);
+const [curMax, setCurMax] = useState(maxPrice);
+
+// When filters change, update API call!
+const updateProducts = () => {
+  setLoading(true);
+  let url = `/api/products?category=${slug}`;
+  if (selectedSubcat !== "All") url += `&subcategory=${encodeURIComponent(selectedSubcat)}`;
+  if (curMin !== minPrice || curMax !== maxPrice) url += `&min=${curMin}&max=${curMax}`;
+  if (sort) url += `&sort=${sort}`;
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      setProducts(data);
+      setLoading(false);
+    });
+};
+
+// In useEffect for any filter change:
+useEffect(() => { updateProducts(); }, [slug, selectedSubcat, curMin, curMax, sort]);
