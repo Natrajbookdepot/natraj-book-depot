@@ -1,45 +1,36 @@
 import React, { useEffect, useState, useRef } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import useSettings from "../hooks/useSettings";
 import { MagnifyingGlassIcon, ShoppingBagIcon, Bars3Icon } from "@heroicons/react/24/outline";
 import { Heart } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import LogoutButton from "./LogoutButton";  // adjust path if needed
 
-
 export default function Navbar() {
   const settings = useSettings();
-  const { user, logout } = useAuth();
+  const { user, wishlist } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const [wishlistOpen, setWishlistOpen] = useState(false);
 
   const dropdownRef = useRef(null);
-  const wishlistRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) setShowDropdown(false);
-      if (wishlistRef.current && !wishlistRef.current.contains(event.target)) setWishlistOpen(false);
     }
-    if (showDropdown || wishlistOpen) document.addEventListener("mousedown", handleClickOutside);
+    if (showDropdown) document.addEventListener("mousedown", handleClickOutside);
     else document.removeEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showDropdown, wishlistOpen]);
+  }, [showDropdown]);
 
   if (!settings) return <div className="h-16 bg-gray-200 animate-pulse" />;
 
   const handleHamburgerClick = () => {
     setShowMobileMenu((v) => !v);
-    setShowDropdown(false);
-    setWishlistOpen(false);
-  };
-
-  const toggleWishlist = () => {
-    setWishlistOpen((v) => !v);
     setShowDropdown(false);
   };
 
@@ -73,8 +64,7 @@ export default function Navbar() {
               <input
                 type="text"
                 placeholder="Search..."
-                className="w-full rounded-full border border-gray-300 px-4 py-2 pl-10
-                  focus:outline-none focus:ring-2 focus:ring-pink-400 bg-white shadow-sm text-base"
+                className="w-full rounded-full border border-gray-300 px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-pink-400 bg-white shadow-sm text-base"
               />
               <MagnifyingGlassIcon className="w-5 h-5 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
             </div>
@@ -83,22 +73,25 @@ export default function Navbar() {
           {/* Right side icons and buttons */}
           <div className="flex items-center gap-2 min-w-0 flex-shrink-0">
             {/* Wishlist */}
-            <div className="relative" ref={wishlistRef}>
-              <button
-                className="p-2 rounded-full hover:bg-gray-100 transition"
-                title="Wishlist"
-                onClick={toggleWishlist}
-                aria-expanded={wishlistOpen}
-                aria-haspopup="true"
-              >
-                <Heart className="w-6 h-6 text-gray-700" />
-              </button>
-              {wishlistOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded shadow-lg z-50 max-h-60 overflow-auto">
-                  <div className="p-4 text-center text-gray-600">Wishlist is empty.</div>
-                </div>
-              )}
-            </div>
+            <button
+  className="p-2 rounded-full hover:bg-gray-100 transition"
+  title="Wishlist"
+  onClick={() => {
+    if (!user) navigate('/login');
+    else if (location.pathname === "/wishlist") {
+      // Go back to previous page (same as in WishlistPage)
+      const prev = window.sessionStorage.getItem("lastWishlistReferrer");
+      if (prev && prev !== "/wishlist") navigate(prev);
+      else if (window.history.length > 1) navigate(-1);
+      else navigate("/");
+    } else {
+      navigate("/wishlist", { state: { fromWishlist: true } });
+    }
+  }}
+  aria-label="Wishlist"
+>
+  <Heart className="w-6 h-6" />
+</button>
 
             {/* Cart icon */}
             <button
@@ -130,7 +123,6 @@ export default function Navbar() {
                 >
                   <Bars3Icon className="h-6 w-6" />
                 </button>
-
                 {/* Desktop login/create buttons */}
                 <NavLink
                   to="/login"
@@ -177,13 +169,12 @@ export default function Navbar() {
                       Orders
                     </button>
                     <button
-  onClick={() => {
-    setDropdown(false);
-  }}
->
-  <LogoutButton />
-</button>
-
+                      onClick={() => {
+                        setShowDropdown(false);
+                      }}
+                    >
+                      <LogoutButton />
+                    </button>
                   </div>
                 )}
               </div>
@@ -244,8 +235,7 @@ export default function Navbar() {
             >
               Orders
             </button>
-           <LogoutButton onLogout={() => setMobileMenu(false)} />
-
+            <LogoutButton onLogout={() => setShowMobileMenu(false)} />
           </div>
         )}
       </nav>

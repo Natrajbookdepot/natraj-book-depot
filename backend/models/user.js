@@ -5,8 +5,14 @@ const userSchema = new mongoose.Schema({
   email: { type: String, lowercase: true, unique: true, sparse: true },
   phone: { type: String, unique: true, sparse: true },
   password: { type: String },
-  otp: { type: String },         // <--- must be present
-  otpExpiry: { type: Date },     // <--- must be present
+  wishlist: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product'
+    }
+  ],
+  otp: { type: String },
+  otpExpiry: { type: Date },
   verified: { type: Boolean, default: false },
   role: { type: String, enum: ['user', 'admin'], default: 'user' }
 }, { timestamps: true });
