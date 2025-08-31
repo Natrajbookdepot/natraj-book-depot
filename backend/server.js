@@ -12,6 +12,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
+
 // ─── Static Assets ─────────────────────────────────────────────────────────────
 // Serve images from frontend/public/images/ and backend/uploads/ directories
 app.use('/category', express.static(path.join(__dirname, '../frontend/public/category')));
@@ -32,6 +36,12 @@ app.use('/api/products', require('./routes/productRoutes'));
 
 // ─── Review Route ─────────────────────────────────────────────────────────────
 app.use('/api/reviews', require('./routes/ReviewRoutes')); // ADD THIS LINE
+
+// ─── Wishlist Route ────────────────────────────────────────────────────────────
+app.use('/api/wishlist', require('./routes/wishlistRoutes'));
+
+// ─── Auth Route ────────────────────────────────────────────────────────────────
+app.use("/api/auth", require("./routes/authRoutes"));
 
 // ─── Default Test Route ─────────────────────────────────────────────────────────
 app.get('/', (req, res) => {

@@ -1,56 +1,64 @@
-import React, { useState, useRef, useEffect } from 'react';
-import useSettings from '../hooks/useSettings';
-import AuthModal from './AuthModal';
-import { useAuth } from '../context/AuthContext';
-import { MagnifyingGlassIcon, ShoppingBagIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import React, { useEffect, useState, useRef } from "react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import useSettings from "../hooks/useSettings";
+import { MagnifyingGlassIcon, ShoppingBagIcon, Bars3Icon } from "@heroicons/react/24/outline";
+import { Heart } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import LogoutButton from "./LogoutButton";  // adjust path if needed
 
 export default function Navbar() {
   const settings = useSettings();
-  const { user, login, logout } = useAuth();
-  const [modalOpen, setModalOpen] = useState(false);
+  const { user, wishlist } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
-  // Dropdown close on outside click (for avatar)
   const dropdownRef = useRef(null);
+
   useEffect(() => {
     function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) setShowDropdown(false);
     }
-    if (showDropdown) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
+    if (showDropdown) document.addEventListener("mousedown", handleClickOutside);
+    else document.removeEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showDropdown]);
 
   if (!settings) return <div className="h-16 bg-gray-200 animate-pulse" />;
 
-  // Hamburger logic (menu for mobile)
   const handleHamburgerClick = () => {
-    setShowMobileMenu(v => !v);
+    setShowMobileMenu((v) => !v);
     setShowDropdown(false);
   };
 
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-r from-purple-200 via-pink-200 to-yellow-200 shadow">
-      <div className="max-w-screen-xl mx-auto w-full px-3 sm:px-5">
-        <div className="flex h-16 items-center justify-between">
-          {/* --- Logo --- */}
-          <div className="flex-shrink-0 flex items-center gap-2 min-w-[160px]">
-            <img src={settings.logoUrl} alt="Logo" className="h-10 w-10 object-contain" />
-            <span className="
-              font-extrabold font-montserrat text-xl lg:text-2xl tracking-tight text-gray-900 drop-shadow
-            ">
+      <nav className="max-w-screen-xl mx-auto w-full px-3 sm:px-5">
+        <div className="flex h-16 items-center justify-between min-w-0">
+          {/* Logo and site name */}
+          <div
+            className="flex flex-shrink-0 items-center gap-2 min-w-0 max-w-[50vw] cursor-pointer"
+            onClick={() => navigate("/")}
+          >
+            <img src={settings.logoUrl} alt="Logo" className="h-9 w-9 flex-shrink-0 object-contain" />
+            <span
+              className="font-extrabold text-base sm:text-lg md:text-xl lg:text-2xl text-gray-900 drop-shadow truncate block"
+              style={{
+                minWidth: 0,
+                maxWidth: "calc(100vw - 220px)",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
               {settings.siteName}
             </span>
           </div>
 
-          {/* --- Search + Cart (Desktop/Tablet) --- */}
+          {/* Search bar (desktop only) */}
           <div className="hidden md:flex flex-1 items-center justify-center px-2">
             <div className="w-full max-w-lg relative">
               <input
@@ -62,80 +70,111 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* --- Right: Cart (always), Avatar/Login/Hamburger --- */}
-          <div className="flex items-center gap-4 min-w-[110px] justify-end">
-            {/* Cart: always visible */}
-            <button className="p-2 rounded-full hover:bg-gray-100 transition" title="Cart">
+          {/* Right side icons and buttons */}
+          <div className="flex items-center gap-2 min-w-0 flex-shrink-0">
+            {/* Wishlist */}
+            <button
+  className="p-2 rounded-full hover:bg-gray-100 transition"
+  title="Wishlist"
+  onClick={() => {
+    if (!user) navigate('/login');
+    else if (location.pathname === "/wishlist") {
+      // Go back to previous page (same as in WishlistPage)
+      const prev = window.sessionStorage.getItem("lastWishlistReferrer");
+      if (prev && prev !== "/wishlist") navigate(prev);
+      else if (window.history.length > 1) navigate(-1);
+      else navigate("/");
+    } else {
+      navigate("/wishlist", { state: { fromWishlist: true } });
+    }
+  }}
+  aria-label="Wishlist"
+>
+  <Heart className="w-6 h-6" />
+</button>
+
+            {/* Cart icon */}
+            <button
+              className="p-2 rounded-full hover:bg-gray-100 transition"
+              title="Cart"
+              onClick={() => navigate("/cart")}
+            >
               <ShoppingBagIcon className="w-6 h-6 text-gray-700" />
             </button>
 
-            {/* Mobile Only: Magnify icon to open search */}
+            {/* Mobile search button */}
             <button
               className="md:hidden p-2 rounded-full hover:bg-gray-100 transition"
               aria-label="Open search"
-              onClick={() => setShowMobileSearch(v => !v)}
+              onClick={() => setShowMobileSearch((v) => !v)}
             >
               <MagnifyingGlassIcon className="h-6 w-6" />
             </button>
 
-            {/* If not logged in: Hamburger (mobile) + Login/Create (desktop only) */}
+            {/* If NOT logged in - show hamburger for mobile + login/create desktop buttons */}
             {!user ? (
               <>
-                {/* Hamburger: Only on mobile */}
+                {/* Hamburger mobile only */}
                 <button
                   className="md:hidden p-2 rounded-full hover:bg-gray-100 transition"
                   onClick={handleHamburgerClick}
                   title="Menu"
+                  type="button"
                 >
                   <Bars3Icon className="h-6 w-6" />
                 </button>
-                {/* Desktop Login/Create: Only on md+ */}
-                <button
-                  className="hidden md:block bg-gray-800 text-white px-4 py-2 rounded-full hover:bg-gray-700"
-                  onClick={() => setModalOpen(true)}
-                >Login</button>
-                <button
-                  className="hidden md:block border border-gray-800 px-4 py-2 rounded-full hover:bg-gray-100 ml-2"
-                  onClick={() => setModalOpen(true)}
-                >Create Account</button>
-                <AuthModal
-                  open={modalOpen}
-                  onClose={() => setModalOpen(false)}
-                  onLogin={login}
-                />
-                {/* Hamburger Dropdown: Only shows on mobile menu tap */}
-                {showMobileMenu && (
-                  <div className="absolute top-16 right-2 w-44 bg-white rounded shadow z-50">
-                    <button
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                      onClick={() => { setModalOpen(true); setShowMobileMenu(false); }}
-                    >Login</button>
-                    <button
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                      onClick={() => { setModalOpen(true); setShowMobileMenu(false); }}
-                    >Create Account</button>
-                  </div>
-                )}
+                {/* Desktop login/create buttons */}
+                <NavLink
+                  to="/login"
+                  className="hidden md:block bg-gray-800 text-white px-4 py-2 rounded-full hover:bg-gray-700 whitespace-nowrap"
+                >
+                  Login
+                </NavLink>
+                <NavLink
+                  to="/register"
+                  className="hidden md:block border border-gray-800 px-4 py-2 rounded-full hover:bg-gray-100 ml-2 whitespace-nowrap"
+                >
+                  Create Account
+                </NavLink>
               </>
             ) : (
-              // If logged in: Avatar only (never hamburger)
+              // Logged in - show avatar with dropdown menu ONLY
               <div className="relative" ref={dropdownRef}>
                 <img
-                  src={user.avatar || "https://randomuser.me/api/portraits/men/75.jpg"}
+                  src={user.avatar || "https://randomuser.me/api/portraits/lego/1.jpg"}
                   alt="profile"
                   className="w-9 h-9 rounded-full cursor-pointer border object-cover"
-                  onClick={() => setShowDropdown(v => !v)}
+                  onClick={() => setShowDropdown((v) => !v)}
                   aria-haspopup="true"
                   aria-expanded={showDropdown}
                 />
                 {showDropdown && (
                   <div className="absolute right-0 mt-2 bg-white shadow rounded p-2 w-40 z-50">
-                    <button className="block w-full text-left py-1 hover:bg-gray-100">Profile</button>
-                    <button className="block w-full text-left py-1 hover:bg-gray-100">Orders</button>
                     <button
                       className="block w-full text-left py-1 hover:bg-gray-100"
-                      onClick={() => { setShowDropdown(false); logout(); }}
-                    >Logout</button>
+                      onClick={() => {
+                        setShowDropdown(false);
+                        navigate("/profile");
+                      }}
+                    >
+                      Profile
+                    </button>
+                    <button
+                      className="block w-full text-left py-1 hover:bg-gray-100"
+                      onClick={() => {
+                        setShowDropdown(false);
+                        navigate("/orders");
+                      }}
+                    >
+                      Orders
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowDropdown(false);
+                      }}
+                    >
+                      <LogoutButton />
+                    </button>
                   </div>
                 )}
               </div>
@@ -143,7 +182,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* --- Mobile: Search bar below header if magnify tapped --- */}
+        {/* Mobile Search dropdown */}
         {showMobileSearch && (
           <div className="md:hidden flex justify-center mt-2 pb-1">
             <div className="w-full max-w-xs relative">
@@ -156,7 +195,50 @@ export default function Navbar() {
             </div>
           </div>
         )}
-      </div>
+
+        {/* Mobile Menu dropdown (ONLY for NOT logged in or logged in) */}
+        {showMobileMenu && !user && (
+          <div className="md:hidden absolute top-16 right-2 w-44 bg-white rounded shadow z-50">
+            <NavLink
+              to="/login"
+              className="w-full block text-left px-4 py-2 hover:bg-gray-100"
+              onClick={() => setShowMobileMenu(false)}
+            >
+              Login
+            </NavLink>
+            <NavLink
+              to="/register"
+              className="w-full block text-left px-4 py-2 hover:bg-gray-100"
+              onClick={() => setShowMobileMenu(false)}
+            >
+              Create Account
+            </NavLink>
+          </div>
+        )}
+        {showMobileMenu && user && (
+          <div className="md:hidden absolute top-16 right-2 w-44 bg-white rounded shadow z-50">
+            <button
+              className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+              onClick={() => {
+                setShowMobileMenu(false);
+                navigate("/profile");
+              }}
+            >
+              Profile
+            </button>
+            <button
+              className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+              onClick={() => {
+                setShowMobileMenu(false);
+                navigate("/orders");
+              }}
+            >
+              Orders
+            </button>
+            <LogoutButton onLogout={() => setShowMobileMenu(false)} />
+          </div>
+        )}
+      </nav>
     </header>
   );
 }

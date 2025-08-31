@@ -1,11 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import { AuthProvider } from './context/AuthContext';
-import Home from './pages/Home';
-import Categories from './pages/categories'; // <-- All Categories grid page
-import CategoryProducts from './pages/CategoryProducts'; // <-- Category Products Page
-import ProductDetailPage from './pages/productDetailPage'; // <-- Import ProductDetailPage
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import { AuthProvider } from "./context/AuthContext";
+import Home from "./pages/Home";
+import Categories from "./pages/categories"; 
+import CategoryProducts from "./pages/CategoryProducts";
+import ProductDetailPage from "./pages/productDetailPage";
+import WishlistPage from './pages/WishlistPage'; 
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 function App() {
   return (
@@ -15,20 +18,13 @@ function App() {
           <Navbar />
           <div className="flex-1">
             <Routes>
-              {/* Home page */}
               <Route path="/" element={<Home />} />
-
-              {/* All Categories grid page */}
               <Route path="/categories" element={<Categories />} />
-
-              {/* Category Product List Page (Dynamic) */}
               <Route path="/category/:slug" element={<CategoryProducts />} />
-
-              {/* Product Detail Page */}
-              <Route path="/product/:slug" element={<ProductDetailPage />} /> {/* <-- Add this line */}
-
-              {/* TODO: Add more pages below as you build */}
-              {/* <Route path="/about" element={<About />} /> */}
+              <Route path="/product/:slug" element={<ProductDetailPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+               <Route path="/wishlist" element={<WishlistPage />} />
             </Routes>
           </div>
           <Footer />
@@ -37,5 +33,4 @@ function App() {
     </AuthProvider>
   );
 }
-
 export default App;

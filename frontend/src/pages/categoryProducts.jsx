@@ -121,11 +121,13 @@ const CategoryProducts = () => {
     ? { background: catGradient.replace("135deg", "120deg") }
     : { backgroundColor: catGradient };
 
-  let gridCols = "grid-cols-1 max-w-xs";
-  if (products.length === 2) gridCols = "grid-cols-2 max-w-2xl";
-  else if (products.length === 3) gridCols = "grid-cols-3 max-w-3xl";
-  else if (products.length === 4) gridCols = "grid-cols-4 max-w-4xl";
-  else if (products.length >= 5) gridCols = "grid-cols-5 max-w-6xl";
+  // let gridCols = "grid-cols-1 max-w-xs";
+  // if (products.length === 2) gridCols = "grid-cols-2 max-w-2xl";
+  // else if (products.length === 3) gridCols = "grid-cols-3 max-w-3xl";
+  // else if (products.length === 4) gridCols = "grid-cols-4 max-w-4xl";
+  // else if (products.length >= 5) gridCols = "grid-cols-5 max-w-6xl";
+  const gridCols = "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 w-full";
+
 
   const handleCardClick = (slug) => {
     navigate(`/product/${slug}`);
@@ -244,14 +246,25 @@ const CategoryProducts = () => {
 
       {/* Product Grid */}
       <div className="flex w-full justify-center pt-2">
-        <div
+        {/* <div
           className={`grid gap-8 pb-12 w-full mx-auto ${gridCols}`}
           style={{
             minHeight: "200px",
             alignItems: "stretch",
             justifyItems: "center"
           }}
-        >
+        > */}
+     <div
+  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 w-full"
+  style={{
+    minHeight: 200,
+    alignItems: "stretch",
+    justifyItems: "center"
+  }}
+>
+
+
+
           {products.length === 0 ? (
             <div className="col-span-full text-center text-gray-500 py-24 text-xl">
               No products found in this category.
@@ -263,6 +276,14 @@ const CategoryProducts = () => {
                 className={`relative rounded-2xl shadow-lg hover:shadow-2xl transition
                   flex flex-col justify-start items-stretch w-[220px] max-w-xs min-h-[265px]
                   border border-gray-50 cursor-pointer group overflow-hidden`}
+  //              className={`relative rounded-2xl shadow-lg hover:shadow-2xl transition
+  // flex flex-col justify-start items-stretch mx-auto min-h-[265px]
+  // w-full max-w-[330px] border border-gray-50 cursor-pointer group overflow-hidden`}
+// className={`relative rounded-2xl shadow-lg hover:shadow-2xl transition
+//   flex flex-col justify-start items-stretch w-full max-w-xs mx-auto min-h-[265px]
+//   border border-gray-50 cursor-pointer group overflow-hidden`}
+
+ 
                 tabIndex={0}
                 onClick={() => handleCardClick(product.slug)}
                 onKeyPress={e => {
