@@ -3,12 +3,13 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { AuthProvider } from "./context/AuthContext";
 import Home from "./pages/Home";
-import Categories from "./pages/categories"; 
+import Categories from "./pages/categories";
 import CategoryProducts from "./pages/CategoryProducts";
 import ProductDetailPage from "./pages/productDetailPage";
-import WishlistPage from './pages/WishlistPage'; 
+import WishlistPage from "./pages/WishlistPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -22,9 +23,34 @@ function App() {
               <Route path="/categories" element={<Categories />} />
               <Route path="/category/:slug" element={<CategoryProducts />} />
               <Route path="/product/:slug" element={<ProductDetailPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-               <Route path="/wishlist" element={<WishlistPage />} />
+
+              {/* Guest-only routes */}
+              <Route
+                path="/login"
+                element={
+                  <ProtectedRoute guestOnly>
+                    <LoginPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <ProtectedRoute guestOnly>
+                    <RegisterPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Authenticated-only route */}
+              <Route
+                path="/wishlist"
+                element={
+                  <ProtectedRoute>
+                    <WishlistPage />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </div>
           <Footer />
