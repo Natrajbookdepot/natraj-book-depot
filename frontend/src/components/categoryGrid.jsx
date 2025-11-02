@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import CategoryCard from "./CategoryCard";
+import CategoryCard from "./categoryCard";
 import axios from "axios";
 import LogoLoader from "./LogoLoader";
 
