@@ -4,11 +4,13 @@ import axios from "axios";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
+  /* ――― Global state ――― */
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [wishlist, setWishlist] = useState([]);
   const [wishlistLoading, setWishlistLoading] = useState(false);
 
+  /* ――― Check session once on mount ――― */
   useEffect(() => {
     setLoading(true);
     axios
@@ -18,9 +20,11 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
+  /* ――― Keep wishlist in sync with logged-in user ――― */
   useEffect(() => {
     if (user && user._id) fetchWishlist();
     else setWishlist([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   async function fetchWishlist() {
@@ -35,18 +39,23 @@ export function AuthProvider({ children }) {
         headers: { "X-User-Id": user._id },
       });
       setWishlist(Array.isArray(res.data.items) ? res.data.items : []);
-    } catch (e) {
+    } catch {
       setWishlist([]);
     } finally {
       setWishlistLoading(false);
     }
   }
 
+  /* ――― Public API ――― */
   const login = async (credentials) => {
-    const { data } = await axios.post("/api/auth/login", credentials, { withCredentials: true });
+    const { data } = await axios.post(
+      "/api/auth/login",
+      credentials,
+      { withCredentials: true }
+    );
     setUser(data.user);
     await fetchWishlist();
-    return data;
+    return data;                 // ⬅️ expose { token, user }
   };
 
   const logout = async () => {
@@ -56,15 +65,23 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (payload) => {
-    const { data } = await axios.post("/api/auth/register", payload, { withCredentials: true });
+    const { data } = await axios.post(
+      "/api/auth/register",
+      payload,
+      { withCredentials: true }
+    );
     return data;
   };
 
   const verifyOTP = async (userId, otp) => {
-    const { data } = await axios.post("/api/auth/verify-otp", { userId, otp }, { withCredentials: true });
+    const { data } = await axios.post(
+      "/api/auth/verify-otp",
+      { userId, otp },
+      { withCredentials: true }
+    );
     setUser(data.user);
     await fetchWishlist();
-    return data;
+    return data;                 // ⬅️ expose { token, user }
   };
 
   const addToWishlist = async (productId) => {
@@ -87,6 +104,7 @@ export function AuthProvider({ children }) {
     await fetchWishlist();
   };
 
+  /* ――― Provider ――― */
   return (
     <AuthContext.Provider
       value={{
