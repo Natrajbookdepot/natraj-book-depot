@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import logo from "/logo.png"; // adjust path as needed
+import { FiLogOut } from "react-icons/fi";
 
 const getAdminName = () => {
-  return localStorage.getItem("adminName") || "Yash";
+  return localStorage.getItem("adminName") || "Admin";
 };
 
 export default function Topbar({ onHamburgerClick }) {
@@ -29,27 +30,40 @@ export default function Topbar({ onHamburgerClick }) {
         >
           ☰
         </button>
-       <img
+        <img
           src={logo}
           alt="logo"
           className="h-8 w-auto mr-2"
           style={{ objectFit: "contain" }}
         />
-        <span className="font-bold text-lg text-slate-800">Natraj Admin</span>
+        <span className="font-bold text-xl text-slate-800">Natraj Admin</span>
       </div>
       {/* Right: Greeting, avatar, logout */}
       <div className="flex items-center">
-        <span className="font-medium mr-4 text-sm">
-          Hii, {adminName}
-        </span>
-        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-lg mr-4" title={adminName}>
+        <span className="font-medium mr-4 text-lg">Hii, <strong>{adminName}</strong></span>
+        <div
+          className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-lg mr-4"
+          title={adminName}
+        >
           {firstLetter}
         </div>
-        <button
+        {/* <button
           onClick={handleLogout}
           className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-4 rounded"
         >
           Logout
+        </button> */}
+
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded
+            flex items-center justify-center
+            lg:px-4 lg:py-2
+            lg:w-auto lg:h-auto
+            sm:w-10 sm:h-10 sm:p-0 sm:rounded"
+        >
+          <span className="hidden  lg:inline">Logout</span>
+          <FiLogOut className="inline lg:hidden text-xl" />
         </button>
       </div>
     </header>
