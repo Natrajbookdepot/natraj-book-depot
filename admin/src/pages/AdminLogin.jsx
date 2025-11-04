@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import LogoLoader from "../components/Logoloader"; // Use the *same* loader.
+import LogoLoader from "../components/Logoloader"; // Use the same loader.
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +19,7 @@ export default function AdminLogin() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Login failed");
 
-      // **Check for admin/staff role**
+      // *Check for admin/staff role*
       const cleanRole = data.user.role && data.user.role.toLowerCase().trim();
       if (!["super-admin", "staff"].includes(cleanRole)) {
         setErr("Only admin/staff can use this panel");
@@ -29,6 +29,10 @@ export default function AdminLogin() {
       // Save session and jump directly to the admin dashboard
       localStorage.setItem("jwt", data.token);
       localStorage.setItem("role", cleanRole);
+
+      localStorage.setItem("userId", data.user.id || data.user._id);
+      localStorage.setItem("adminName", data.user.name);
+      
       setLoading(false);
       window.location.replace("/admin");
     } catch (e) {
