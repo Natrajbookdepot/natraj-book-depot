@@ -11,6 +11,8 @@ const sendSMS  = require("../utils/smsSender");
 const router   = express.Router();
 
 const JWT_SECRET   = process.env.JWT_SECRET || "your-secret-key";
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
+
 const OTP_EXPIRE_MS = 5 * 60 * 1_000; // 5 min
 
 const allowedDomains = [
