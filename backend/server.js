@@ -15,6 +15,8 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
+
 
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
