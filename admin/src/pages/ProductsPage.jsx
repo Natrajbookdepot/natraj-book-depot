@@ -1,8 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import AddEditProductModal from "../components/AddEditProductModal";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function ProductsPage() {
+  const { t } = useLanguage();
+  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const [products, setProducts] = useState([]);
@@ -116,12 +121,21 @@ export default function ProductsPage() {
 
   return (
     <div className="w-full mx-auto px-1 sm:px-4 lg:px-8 border">
-      <h1 className="text-2xl font-bold mb-4 mt-4">Products</h1>
+      <div className="flex items-center gap-2 mt-4 mb-4">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="p-2 mr-2 rounded-full hover:bg-slate-200 transition-colors"
+          title={t("common.back") || "Back"}
+        >
+          <ArrowLeftIcon className="w-6 h-6 text-slate-600" />
+        </button>
+        <h1 className="text-2xl font-bold">{t("pages.products.title")}</h1>
+      </div>
       <div className="flex flex-wrap mb-4 gap-2 items-center">
         <input
           className="border rounded px-2 py-1 w-full sm:w-auto"
           type="search"
-          placeholder="Search products..."
+          placeholder={t("pages.products.search")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -132,13 +146,13 @@ export default function ProductsPage() {
             setModalOpen(true);
           }}
         >
-          Add New
+          {t("pages.products.addProduct")}
         </button>
         <button
           className="bg-blue-600 text-white px-3 py-1 rounded"
           onClick={uploadExcel}
         >
-          Bulk Excel Upload
+          {t("pages.products.bulkUpload")}
         </button>
         <input
           ref={fileInputRef}
@@ -154,19 +168,19 @@ export default function ProductsPage() {
           <thead>
             <tr className="bg-slate-100 text-gray-700">
               <th className="px-3 py-3 text-left min-w-[140px] font-semibold">
-                Name
+                {t("pages.products.productName")}
               </th>
               <th className="px-3 py-3 text-left min-w-[110px] font-semibold">
-                Category
+                {t("pages.products.productCategory")}
               </th>
               <th className="px-3 py-3 text-center min-w-[80px] font-semibold">
-                Stock
+                {t("pages.products.productStock")}
               </th>
               <th className="px-3 py-3 text-center min-w-[100px] font-semibold">
-                Price
+                {t("pages.products.productPrice")}
               </th>
               <th className="px-3 py-3 text-center min-w-[120px] font-semibold">
-                Actions
+                {t("common.actions")}
               </th>
             </tr>
           </thead>
@@ -202,22 +216,22 @@ export default function ProductsPage() {
                 <td className="px-3 py-3 text-center space-x-4">
                   <button
                     className="inline-flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white rounded-md px-2 py-1 transition-all shadow-md"
-                    title="Edit"
+                    title={t("common.edit")}
                     onClick={() => {
                       setEditProduct(prod);
                       setModalOpen(true);
                     }}
                   >
                     {/* Edit svg... */}
-                    <span className="hidden md:inline">Edit</span>
+                    <span className="hidden md:inline">{t("common.edit")}</span>
                   </button>
                   <button
                     className="inline-flex items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-md px-2 py-1 transition-all shadow-md"
-                    title="Delete"
+                    title={t("common.delete")}
                     onClick={() => handleDelete(prod._id)}
                   >
                     {/* Delete svg... */}
-                    <span className="hidden md:inline">Delete</span>
+                    <span className="hidden md:inline">{t("common.delete")}</span>
                   </button>
                 </td>
               </tr>
@@ -235,11 +249,11 @@ export default function ProductsPage() {
           >
             <div className="font-bold text-gray-900 mb-1">{prod.title}</div>
             <div className="text-gray-500 mb-1">
-              <span className="font-semibold">Category: </span>
+              <span className="font-semibold">{t("pages.products.mobileCategory")}: </span>
               {prod.categorySlug}
             </div>
             <div className="mb-1">
-              <span className="font-semibold text-gray-500">Stock: </span>
+              <span className="font-semibold text-gray-500">{t("pages.products.mobileStock")}: </span>
               <span
                 className={`inline-block px-2 py-1 rounded-full text-xs 
           ${
@@ -262,13 +276,13 @@ export default function ProductsPage() {
                   setModalOpen(true);
                 }}
               >
-                Edit
+                {t("common.edit")}
               </button>
               <button
                 className="flex-1 bg-red-500 hover:bg-red-600 text-white rounded-md px-2 py-1 font-semibold shadow"
                 onClick={() => handleDelete(prod._id)}
               >
-                Delete
+                {t("common.delete")}
               </button>
             </div>
           </div>

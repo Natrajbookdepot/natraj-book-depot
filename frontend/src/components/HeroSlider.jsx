@@ -19,7 +19,10 @@ export default function HeroSlider() {
     axios
       .get(`${API_URL}/api/herobanners`)
       .then(res => setBanners(res.data || []))
-      .catch(()  => setBanners([]))
+      .catch(err => {
+        console.error('Failed to load banners:', err.message);
+        setBanners([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -47,7 +50,7 @@ export default function HeroSlider() {
   return (
     <div className="apple-hero-slider relative w-full h-[60vw] max-h-[520px] overflow-hidden">
       <Swiper
-        key={banners.length}               // restart autoplay when list changes
+        key={banners.length}
         modules={[Autoplay, Pagination]}
         autoplay={{ delay: AUTOPLAY_DELAY, disableOnInteraction: false }}
         pagination={{ clickable: true }}
@@ -57,11 +60,11 @@ export default function HeroSlider() {
         {banners.map((banner, i) => (
           <SwiperSlide key={banner._id ?? i}>
             {isVideo(banner) ? (
-              /* ---------- Video banner ---------- */
+              /* Video banner */
               <div className="relative w-full h-full">
                 <video
                   ref={videoRef}
-                  src={banner.mediaUrl}      /* Cloudinary URL already full */
+                  src={banner.mediaUrl}
                   className="object-cover w-full h-full"
                   autoPlay
                   muted
@@ -71,32 +74,58 @@ export default function HeroSlider() {
                 {banner.showButton && (
                   <a
                     href={banner.ctaLink}
-                    className="absolute left-1/2 bottom-10 -translate-x-1/2 px-6 py-3 rounded-2xl bg-yellow-400 text-black font-bold shadow-lg hover:bg-yellow-500 transition"
+                    className="absolute left-1/2 bottom-10 -translate-x-1/2 px-6 py-3 rounded-2xl shadow-lg hover:shadow-xl transition"
+                    style={{
+                      color: banner.ctaStyle?.color || '#000000',
+                      backgroundColor: banner.ctaStyle?.backgroundColor || '#ffffff',
+                      fontSize: `${banner.ctaStyle?.fontSize || 16}px`,
+                      fontWeight: banner.ctaStyle?.fontWeight || 'bold',
+                      fontFamily: banner.ctaStyle?.fontFamily || 'Arial'
+                    }}
                   >
                     {banner.ctaText}
                   </a>
                 )}
               </div>
             ) : (
-              /* ---------- Image banner ---------- */
+              /* Image banner */
               <div className="relative w-full h-full">
                 <img
-                  src={banner.mediaUrl}      /* Cloudinary URL */
+                  src={banner.mediaUrl}
                   alt={banner.title}
                   className="object-cover w-full h-full"
                 />
                 <div className="absolute inset-0 bg-black/30" />
-                <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center px-4">
-                  <h1 className="text-2xl md:text-4xl font-extrabold drop-shadow mb-3">
+                <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-4">
+                  <h1 style={{
+                    color: banner.titleStyle?.color || '#ffffff',
+                    fontSize: `${banner.titleStyle?.fontSize || 48}px`,
+                    fontWeight: banner.titleStyle?.fontWeight || 'bold',
+                    fontFamily: banner.titleStyle?.fontFamily || 'Arial',
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+                  }} className="drop-shadow font-black mb-3">
                     {banner.title}
                   </h1>
-                  <p className="text-base md:text-xl mb-6 drop-shadow">
+                  <p style={{
+                    color: banner.subtitleStyle?.color || '#ffffff',
+                    fontSize: `${banner.subtitleStyle?.fontSize || 20}px`,
+                    fontWeight: banner.subtitleStyle?.fontWeight || 'normal',
+                    fontFamily: banner.subtitleStyle?.fontFamily || 'Arial',
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+                  }} className="drop-shadow mb-6">
                     {banner.subtitle}
                   </p>
                   {banner.showButton && (
                     <a
                       href={banner.ctaLink}
-                      className="inline-block px-6 py-3 rounded-2xl bg-yellow-400 text-black font-bold shadow-lg hover:bg-yellow-500 transition"
+                      className="inline-block px-6 py-3 rounded-2xl shadow-lg hover:shadow-xl transition"
+                      style={{
+                        color: banner.ctaStyle?.color || '#000000',
+                        backgroundColor: banner.ctaStyle?.backgroundColor || '#ffffff',
+                        fontSize: `${banner.ctaStyle?.fontSize || 16}px`,
+                        fontWeight: banner.ctaStyle?.fontWeight || 'bold',
+                        fontFamily: banner.ctaStyle?.fontFamily || 'Arial'
+                      }}
                     >
                       {banner.ctaText}
                     </a>
