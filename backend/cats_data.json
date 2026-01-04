@@ -1,0 +1,218 @@
+[
+  {
+    "_id": "6873e8b95005d3cd31d6d61d",
+    "name": "Kids Zone",
+    "subcategories": [
+      {
+        "name": "Learning"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d60f",
+    "name": "Books",
+    "subcategories": [
+      {
+        "name": "School Textbooks"
+      },
+      {
+        "name": "Exam Guides"
+      },
+      {
+        "name": "Practice Papers"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d616",
+    "name": "Craft Paper & Boards",
+    "subcategories": [
+      {
+        "name": "Colored Paper"
+      },
+      {
+        "name": "Boards"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d615",
+    "name": "Office Supplies",
+    "subcategories": [
+      {
+        "name": "Notebooks"
+      },
+      {
+        "name": "Registers"
+      },
+      {
+        "name": "Planners"
+      },
+      {
+        "name": "Filing"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d617",
+    "name": "Educational Aids",
+    "subcategories": [
+      {
+        "name": "Learning Tools"
+      },
+      {
+        "name": "STEM Kits"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d61a",
+    "name": "Tech Accessories",
+    "subcategories": [
+      {
+        "name": "Others"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d612",
+    "name": "Schoolware",
+    "subcategories": [
+      {
+        "name": "Bags"
+      },
+      {
+        "name": "Bottles"
+      },
+      {
+        "name": "Tiffins"
+      },
+      {
+        "name": "Pencil Boxes"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d618",
+    "name": "Gift Items",
+    "subcategories": [
+      {
+        "name": "Gift Wraps"
+      },
+      {
+        "name": "Return Gifts"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d619",
+    "name": "Seasonal Items",
+    "subcategories": [
+      {
+        "name": "Festive"
+      },
+      {
+        "name": "New Year"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d61c",
+    "name": "Boards & Accessories",
+    "subcategories": [
+      {
+        "name": "Whiteboards"
+      },
+      {
+        "name": "Notice Boards"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d613",
+    "name": "Art & Craft",
+    "subcategories": [
+      {
+        "name": "Colors"
+      },
+      {
+        "name": "Painting"
+      },
+      {
+        "name": "Craft Kits"
+      },
+      {
+        "name": "Tools"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d61b",
+    "name": "ID & Labeling",
+    "subcategories": [
+      {
+        "name": "Labels & Tags"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d610",
+    "name": "Notebooks",
+    "subcategories": [
+      {
+        "name": "Drawing Books"
+      },
+      {
+        "name": "Regular Notebooks"
+      },
+      {
+        "name": "Premium Notebooks"
+      },
+      {
+        "name": "test sub"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d614",
+    "name": "Electronics & Tools",
+    "subcategories": [
+      {
+        "name": "Calculators"
+      },
+      {
+        "name": "Glue Guns"
+      },
+      {
+        "name": "Accessories"
+      }
+    ]
+  },
+  {
+    "_id": "6873e8b95005d3cd31d6d611",
+    "name": "Stationery",
+    "subcategories": [
+      {
+        "name": "Writing"
+      },
+      {
+        "name": "Drawing"
+      },
+      {
+        "name": "Organizing"
+      },
+      {
+        "name": "Measuring"
+      }
+    ]
+  },
+  {
+    "_id": "6959440bd9c2759c923d81dc",
+    "name": "old books",
+    "subcategories": [
+      {
+        "name": "banking books"
+      }
+    ]
+  }
+]

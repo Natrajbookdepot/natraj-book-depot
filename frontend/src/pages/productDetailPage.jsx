@@ -100,19 +100,24 @@ export default function ProductDetail() {
             <span className="text-3xl font-bold text-rose-600">
               ₹{product.price}
             </span>
-            <span className="line-through text-gray-400">
+            <span className="line-through text-gray-400 text-lg">
               ₹{Math.round(product.price * 1.25)}
             </span>
-            <span className="text-green-600">20% OFF</span>
+            <span className="text-green-600 font-semibold px-2 py-0.5 bg-green-50 rounded">20% OFF</span>
           </div>
 
-          <p>{product.description}</p>
+          {/* Short Summary */}
+          {product.summary && (
+            <p className="text-gray-600 leading-relaxed border-l-2 border-gray-100 pl-4 italic">
+              {product.summary}
+            </p>
+          )}
 
           {/* stock + wishlist */}
           <div className="flex items-center gap-3">
             <span
               className={clsx(
-                "text-sm font-medium px-2 py-1 rounded",
+                "text-sm font-medium px-3 py-1 rounded-full shadow-sm",
                 product.inStock
                   ? "bg-green-100 text-green-700"
                   : "bg-red-100 text-red-700"
@@ -126,22 +131,23 @@ export default function ProductDetail() {
                 isWishlisted ? "Remove from wishlist" : "Add to wishlist"
               }
               onClick={toggleWishlist}
-              className="p-1"
+              className="p-2 hover:bg-rose-50 rounded-full transition-colors group"
             >
               <Heart
                 size={24}
-                fill={isWishlisted ? "red" : "none"}
-                stroke={isWishlisted ? "red" : "currentColor"}
+                fill={isWishlisted ? "#e11d48" : "none"}
+                stroke={isWishlisted ? "#e11d48" : "currentColor"}
+                className={clsx("transition-transform", !isWishlisted && "group-hover:scale-110")}
               />
             </button>
           </div>
 
           {/* CTA buttons */}
-          <div className="flex gap-4 w-80">
-            <button disabled={!product.inStock} className="btn-primary flex-1">
+          <div className="flex gap-4 w-full sm:w-96 mt-2">
+            <button disabled={!product.inStock} className="btn-primary flex-1 py-3 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all">
               Add to Cart
             </button>
-            <button disabled={!product.inStock} className="btn-secondary flex-1">
+            <button disabled={!product.inStock} className="btn-secondary flex-1 py-3 text-lg rounded-xl shadow-md hover:shadow-lg transition-all border-2">
               Buy Now
             </button>
           </div>
@@ -149,65 +155,109 @@ export default function ProductDetail() {
       </div>
 
       {/* tab bar */}
-      <div className="mt-12 border-b border-gray-200 flex space-x-8 text-base font-semibold">
+      <div className="mt-16 border-b border-gray-200 flex space-x-10 text-lg font-bold">
         {["desc", "specs", "reviews"].map(key => (
           <button
             key={key}
             onClick={() => setTab(key)}
             className={clsx(
-              "pb-2",
+              "pb-4 transition-all relative",
               tab === key
-                ? "border-b-4 border-sky-600 text-sky-600"
-                : "text-gray-500 hover:text-gray-700"
+                ? "text-sky-600"
+                : "text-gray-400 hover:text-gray-600"
             )}
           >
             {key === "desc" ? "Description" : key === "specs" ? "Specifications" : "Reviews"}
+            {tab === key && (
+              <span className="absolute bottom-0 left-0 w-full h-1 bg-sky-600 rounded-t-full" />
+            )}
           </button>
         ))}
       </div>
 
       {/* tab content */}
-      <div className="mt-6">
+      <div className="mt-10 min-h-[400px]">
         {tab === "desc" && (
-          <div className="flex flex-col md:flex-row items-start gap-6">
-            <img
-              src={MAIN_IMG}
-              alt={product.title}
-              loading="lazy"
-              onError={e => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src =
-                  "https://res.cloudinary.com/dgfspqjid/image/upload/v1758993755/natraj-book-depot/category/default-icon.png";
-              }}
-              className="w-full max-w-[320px] rounded shadow-md blur-[2px]"
-              onLoad={e => e.currentTarget.classList.remove("blur-[2px]")}
-              style={{ background: "#fff", minHeight: 350 }}
-            />
-            <div>
-              <h2 className="font-semibold underline mb-3">Product Description</h2>
-              <p>{product.description}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-12 items-start">
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+              <img
+                src={MAIN_IMG}
+                alt={product.title}
+                loading="lazy"
+                onError={e => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src =
+                    "https://res.cloudinary.com/dgfspqjid/image/upload/v1758993755/natraj-book-depot/category/default-icon.png";
+                }}
+                className="w-full rounded-xl blur-[2px] object-contain h-[400px]"
+                onLoad={e => e.currentTarget.classList.remove("blur-[2px]")}
+              />
+            </div>
+            <div className="prose prose-blue max-w-none">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="w-1.5 h-8 bg-sky-600 rounded-full" />
+                Product Details
+              </h2>
+              {/* white-space: pre-wrap preserves line breaks and spaces for bullet points */}
+              <div 
+                className="text-gray-700 leading-relaxed text-lg whitespace-pre-wrap font-medium"
+              >
+                {product.description}
+              </div>
             </div>
           </div>
         )}
 
         {tab === "specs" && (
-          <ul className="max-w-lg list-disc p-4 text-gray-700">
-            <li>
-              <b>Brand:</b> {product.brand || "N/A"}
-            </li>
-            <li>
-              <b>Type:</b> {product.subcategoryName || "N/A"}
-            </li>
-            <li>
-              <b>Price:</b> ₹{product.price}
-            </li>
-            <li>
-              <b>Availability:</b> {product.inStock ? "In Stock" : "Out of Stock"}
-            </li>
-          </ul>
+          <div className="max-w-4xl">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-2">
+              <span className="w-1.5 h-8 bg-sky-600 rounded-full" />
+              Technical Specifications
+            </h2>
+            
+            <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+               <div className="grid grid-cols-1 sm:grid-cols-2">
+                  {/* Default Specs */}
+                  <div className="p-5 border-b sm:border-r border-gray-50 flex flex-col gap-1">
+                    <span className="text-sm font-bold text-sky-600 uppercase tracking-wider">Brand</span>
+                    <span className="text-lg text-gray-800 font-semibold">{product.brand || "Natraj Book Depot"}</span>
+                  </div>
+                  <div className="p-5 border-b border-gray-50 flex flex-col gap-1">
+                    <span className="text-sm font-bold text-sky-600 uppercase tracking-wider">Category</span>
+                    <span className="text-lg text-gray-800 font-semibold">{product.subcategoryName || "General"}</span>
+                  </div>
+                  <div className="p-5 border-b sm:border-r border-gray-50 flex flex-col gap-1">
+                    <span className="text-sm font-bold text-sky-600 uppercase tracking-wider">Stock Status</span>
+                    <span className="text-lg text-gray-800 font-semibold">{product.inStock ? "Currently Available" : "Out of Stock"}</span>
+                  </div>
+                  <div className="p-5 border-b border-gray-50 flex flex-col gap-1">
+                    <span className="text-sm font-bold text-sky-600 uppercase tracking-wider">SKU</span>
+                    <span className="text-lg text-gray-800 font-semibold">{product.slug?.toUpperCase() || "N/A"}</span>
+                  </div>
+
+                  {/* Dynamic Specs */}
+                  {product.specifications?.map((spec, idx) => (
+                    <div 
+                      key={idx} 
+                      className={clsx(
+                        "p-5 border-b flex flex-col gap-1 border-gray-50",
+                        idx % 2 === 0 && "sm:border-r"
+                      )}
+                    >
+                      <span className="text-sm font-bold text-sky-600 uppercase tracking-wider">{spec.key}</span>
+                      <span className="text-lg text-gray-800 font-semibold">{spec.value}</span>
+                    </div>
+                  ))}
+               </div>
+            </div>
+          </div>
         )}
 
-        {tab === "reviews" && <CustomerReviews productId={product._id} />}
+        {tab === "reviews" && (
+          <div className="max-w-5xl">
+             <CustomerReviews productId={product._id} />
+          </div>
+        )}
       </div>
 
       <RelatedProducts products={related.slice(0, 6)} />
