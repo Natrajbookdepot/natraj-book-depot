@@ -1,4 +1,6 @@
-// Example: src/pages/ReportsPage.jsx
+import { useLanguage } from "../context/LanguageContext";
+
 export default function ReportsPage() {
-  return <h1 className="text-2xl font-bold">Reports & Analytics (Coming Soon!)</h1>;
+  const { t } = useLanguage();
+  return <h1 className="text-2xl font-bold">{t("pages.reports.title")} (Coming Soon!)</h1>;
 }

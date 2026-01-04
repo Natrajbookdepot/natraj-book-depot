@@ -41,6 +41,7 @@ app.use('/api/wishlist', require('./routes/wishlistRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
 
 app.use('/api/uploads', require('./routes/uploadRoutes'));
+app.use('/api/translate', require('./routes/translateRoutes'));
 
 // ─── Default Test Route ─────────────────────────────────────────────────────────
 // Simple route to verify that server is running

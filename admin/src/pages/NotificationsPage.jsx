@@ -1,4 +1,6 @@
-// Example: src/pages/ReportsPage.jsx
-export default function ReportsPage() {
-  return <h1 className="text-2xl font-bold">Notification (Coming Soon!)</h1>;
+import { useLanguage } from "../context/LanguageContext";
+
+export default function NotificationsPage() {
+  const { t } = useLanguage();
+  return <h1 className="text-2xl font-bold">{t("pages.notifications.title")} (Coming Soon!)</h1>;
 }

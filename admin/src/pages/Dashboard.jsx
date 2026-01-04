@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useLanguage } from "../context/LanguageContext";
 
 // Helper to fetch with Bearer
 async function authFetch(url, options = {}) {
@@ -14,6 +16,7 @@ async function authFetch(url, options = {}) {
 }
 
 export default function Dashboard() {
+  const { t } = useLanguage();
   // UI state and role selection
   const [stats, setStats] = useState(null);
   const [orders, setOrders] = useState([]);
@@ -84,36 +87,36 @@ useEffect(() => {
 
 
 
-  if (!stats) return <div className="flex items-center justify-center h-64">Loading...</div>;
+  if (!stats) return <div className="flex items-center justify-center h-64">{t("common.loading")}</div>;
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-8">{t("pages.dashboard.title")}</h1>
       {/* Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card color="bg-gradient-to-bl from-teal-400 to-cyan-600" label="Sales Today" value={`₹${stats.salesToday}`} />
-        {role === "super-admin" && <Card color="bg-gradient-to-bl from-indigo-400 to-blue-700" label="Users" value={stats.userCount} />}
-        <Card color="bg-gradient-to-bl from-orange-300 to-amber-600" label="Products" value={stats.productCount} />
-        <Card color="bg-gradient-to-bl from-pink-400 to-fuchsia-600" label="Orders" value={stats.orderCount} />
+        <Card color="bg-gradient-to-bl from-teal-400 to-cyan-600" label={t("pages.dashboard.totalRevenue")} value={`₹${stats.salesToday}`} />
+        {role === "super-admin" && <Card color="bg-gradient-to-bl from-indigo-400 to-blue-700" label={t("pages.dashboard.totalUsers")} value={stats.userCount} to="/admin/users" />}
+        <Card color="bg-gradient-to-bl from-orange-300 to-amber-600" label={t("pages.dashboard.totalProducts")} value={stats.productCount} to="/admin/items" />
+        <Card color="bg-gradient-to-bl from-pink-400 to-fuchsia-600" label={t("pages.dashboard.totalOrders")} value={stats.orderCount} to="/admin/orders" />
       </div>
 
       {/* Charts (placeholder for now) */}
       <div className="bg-white rounded-xl shadow p-6">
-        <h2 className="text-lg font-semibold mb-4">Sales & Orders Trends (Coming soon...)</h2>
-        <div className="h-28 bg-gradient-to-r from-slate-100 to-slate-200 text-center flex items-center justify-center text-gray-400 rounded-lg">[Chart area]</div>
+        <h2 className="text-lg font-semibold mb-4">{t("pages.dashboard.recentOrders")} {t("pages.dashboard.comingSoon")}</h2>
+        <div className="h-28 bg-gradient-to-r from-slate-100 to-slate-200 text-center flex items-center justify-center text-gray-400 rounded-lg">{t("pages.dashboard.chartPlaceholder")}</div>
       </div>
 
       {/* Recent Orders */}
       <div className="bg-white rounded-xl shadow p-6">
-        <h2 className="text-lg font-semibold mb-4">Recent Orders</h2>
+        <h2 className="text-lg font-semibold mb-4">{t("pages.dashboard.recentOrders")}</h2>
         <table className="w-full">
           <thead>
             <tr className="bg-slate-100">
-              <th className="px-3 py-2">Order ID</th>
-              <th className="px-3 py-2">Customer</th>
-              <th className="px-3 py-2">Total</th>
-              <th className="px-3 py-2">Status</th>
-              <th className="px-3 py-2">Date</th>
+              <th className="px-3 py-2">{t("pages.orders.orderId")}</th>
+              <th className="px-3 py-2">{t("pages.orders.customer")}</th>
+              <th className="px-3 py-2">{t("pages.orders.amount")}</th>
+              <th className="px-3 py-2">{t("pages.orders.status")}</th>
+              <th className="px-3 py-2">{t("pages.orders.date")}</th>
             </tr>
           </thead>
           <tbody>
@@ -132,10 +135,10 @@ useEffect(() => {
 
       {/* Low Stock Alerts (super-admin OR staff) */}
       <div className="bg-white rounded-xl shadow p-6">
-        <h2 className="text-lg font-semibold mb-4 text-red-700">Low Stock Alerts</h2>
+        <h2 className="text-lg font-semibold mb-4 text-red-700">{t("pages.dashboard.lowStock")}</h2>
         <ul>
           {lowStock.map(prod => (
-            <li key={prod._id} className="text-red-600 font-medium">{prod.title} - {prod.stockCount} left</li>
+            <li key={prod._id} className="text-red-600 font-medium">{prod.title} - {prod.stockCount} {t("pages.dashboard.stockLeft")}</li>
           ))}
         </ul>
       </div>
@@ -144,13 +147,19 @@ useEffect(() => {
 }
 
 // Basic Card Design for Metrics
-function Card({ label, value, color }) {
-  return (
-    <div className={`rounded-xl shadow bg-white overflow-hidden relative`}>
+function Card({ label, value, color, to }) {
+  const CardContent = (
+    <div className={`rounded-xl shadow bg-white overflow-hidden relative transition-transform hover:scale-105 duration-200 cursor-pointer`}>
       <div className={`${color} p-4 text-white min-h-[92px] flex flex-col justify-center`}>
         <span className="block text-gray-100">{label}</span>
         <span className="block text-2xl font-bold">{value}</span>
       </div>
     </div>
   );
+
+  if (to) {
+    return <Link to={to} className="block">{CardContent}</Link>;
+  }
+
+  return CardContent;
 }

@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import AdminLogin from "../pages/AdminLogin";
 import AdminLayout from "../layouts/AdminLayout";
 import Dashboard from "../pages/Dashboard";
+import BannersPage from "../pages/BannersPage";
+import CategoriesPage from "../pages/CategoriesPage";
 import ProductsPage from "../pages/ProductsPage";
 import OrdersPage from "../pages/OrdersPage";
 import UsersPage from "../pages/UsersPage";
@@ -18,6 +20,8 @@ export default function AdminRoutes() {
       <Route path="/admin" element={<ProtectedRoute />}>
         <Route element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
+          <Route path="banners" element={<BannersPage />} />
+          <Route path="categories" element={<CategoriesPage />} />
           <Route path="items" element={<ProductsPage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="users" element={<UsersPage />} />
