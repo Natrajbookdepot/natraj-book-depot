@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import LogoLoader from "../components/Logoloader"; // Use the same loader.
+import LogoLoader from "../components/Logoloader";
+import { useLanguage } from "../context/LanguageContext";
+
 export default function AdminLogin() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
@@ -17,12 +20,12 @@ export default function AdminLogin() {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Login failed");
+      if (!res.ok) throw new Error(data.error || t("pages.login.invalidCredentials"));
 
       // *Check for admin/staff role*
       const cleanRole = data.user.role && data.user.role.toLowerCase().trim();
       if (!["super-admin", "staff"].includes(cleanRole)) {
-        setErr("Only admin/staff can use this panel");
+        setErr(t("pages.login.onlyAdmin"));
         setLoading(false);
         return;
       }
@@ -41,14 +44,14 @@ export default function AdminLogin() {
     }
   }
 
-  if (loading) return <LogoLoader text="Logging you in as admin…" />;
+  if (loading) return <LogoLoader text={t("pages.login.loggingIn")} />;
   return (
     <div className="flex h-auto lg:p-6 md:flex-row flex-col items-center justify-center gap-6">
       <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 space-y-6">
-        <h2 className="text-3xl font-semibold">Welcome Admin! <br /> Enter your credentials.</h2>
+        <h2 className="text-3xl font-semibold">{t("pages.login.welcome")} <br /> {t("pages.login.enterCredentials")}</h2>
         <input
           type="email"
-          placeholder="Admin Email"
+          placeholder={t("pages.login.adminEmail")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -56,14 +59,14 @@ export default function AdminLogin() {
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder={t("pages.login.password")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
           className="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
         />
         <button type="submit" className="w-full py-2 rounded-full bg-slate-600 text-white font-semibold hover:bg-[#426f82] active:scale-90 transition">
-          Sign in
+          {t("pages.login.signIn")}
         </button>
         {err && <p className="text-red-600">{err}</p>}
       </form>

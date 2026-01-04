@@ -1,11 +1,13 @@
 const HeroBanner = require('../models/herobannerModel');
 
-// List all hero banners
+// List all hero banners - PUBLIC
 exports.listHeroBanners = async (_req, res) => {
   try {
-    const banners = await HeroBanner.find({});
+    const banners = await HeroBanner.find({}).sort({ order: 1 });
+    console.log('✅ GET /api/herobanners - Sent', banners.length, 'banners');
     res.json(banners);
   } catch (err) {
+    console.error('❌ Error fetching banners:', err);
     res.status(500).json({ error: err.message });
   }
 };
