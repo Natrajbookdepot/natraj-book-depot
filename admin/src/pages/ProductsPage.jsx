@@ -2,8 +2,9 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import AddEditProductModal from "../components/AddEditProductModal";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, CloudArrowUpIcon, DocumentArrowDownIcon, TableCellsIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useLanguage } from "../context/LanguageContext";
+import * as XLSX from "xlsx";
 
 export default function ProductsPage() {
   const { t } = useLanguage();
@@ -13,7 +14,22 @@ export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState("");
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [userRole, setUserRole] = useState("");
   const fileInputRef = useRef();
+
+  // Get user role for permissions
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setUserRole(payload.role);
+      } catch (e) {
+        console.error("Failed to parse token payload", e);
+      }
+    }
+  }, []);
 
   // Fetch products
   const fetchProducts = async () => {
@@ -85,33 +101,130 @@ export default function ProductsPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchProducts();
+      setSelectedIds(prev => prev.filter(currId => currId !== id));
     } catch (err) {
       console.error("Product delete failed:", err);
       alert("Delete failed");
     }
   }
 
-  // Excel Upload handler (stub)
+  // Bulk Delete Products
+  async function handleBulkDelete() {
+    if (selectedIds.length === 0) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} products? This action cannot be undone.`)) return;
+
+    try {
+      const token = localStorage.getItem("jwt");
+      await axios.delete('/api/products/bulk/delete', {
+        headers: { Authorization: `Bearer ${token}` },
+        data: { ids: selectedIds }
+      });
+      alert("Products deleted successfully");
+      setSelectedIds([]);
+      fetchProducts();
+    } catch (err) {
+      console.error("Bulk delete failed:", err);
+      alert(err.response?.data?.error || "Bulk delete failed");
+    }
+  }
+
+  // Toggle selection for individual product
+  const toggleSelect = (id) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  // Toggle "Select All"
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredProducts.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredProducts.map(p => p._id));
+    }
+  };
+
+  // 1. Download Template from Backend
+  async function downloadTemplate() {
+    try {
+      const token = localStorage.getItem("jwt");
+      const res = await axios.get("/api/products/bulk/template", {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'product_template.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error("Template download failed:", err);
+      alert("Failed to download template");
+    }
+  }
+
+  // 2. Export All Products from Backend
+  async function exportProducts() {
+    try {
+      const token = localStorage.getItem("jwt");
+      const res = await axios.get("/api/products/bulk/export", {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `products_export_${new Date().toISOString().split('T')[0]}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error("Export products failed:", err);
+      alert("Failed to export products");
+    }
+  }
+
+  // 3. Process Bulk Excel Upload
   async function handleBulkExcel(e) {
     const file = e.target.files?.[0];
     if (!file) return;
-    try {
-      const token = localStorage.getItem("jwt");
-      const fd = new FormData();
-      fd.append("excel", file);
-      // Replace with your real backend bulk endpoint:
-      await axios.post("/api/products/bulk-upload", fd, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      alert("Bulk upload processing...");
-      fetchProducts();
-    } catch (err) {
-      console.error("Bulk upload failed:", err);
-      alert("Bulk Excel upload failed");
-    }
+    
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const bstr = evt.target.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data = XLSX.utils.sheet_to_json(ws);
+        
+        if (data.length === 0) {
+          alert("Excel file is empty");
+          return;
+        }
+
+        const token = localStorage.getItem("jwt");
+        const res = await axios.post("/api/products/bulk/upload", { data }, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const { summary, errors } = res.data;
+        let msg = `Bulk Upload Results:\n- Created: ${summary.created}\n- Updated: ${summary.updated}\n- Failed: ${summary.failed}`;
+        if (errors && errors.length > 0) {
+          msg += `\n\nFirst few errors:\n${errors.join('\n')}`;
+        }
+        alert(msg);
+        fetchProducts();
+      } catch (err) {
+        console.error("Bulk upload processing failed:", err);
+        alert("Bulk Excel upload failed during processing");
+      }
+    };
+    reader.readAsBinaryString(file);
+    // Clear the input so same file can be selected again
+    e.target.value = "";
   }
 
   // Excel Upload Button click
@@ -140,18 +253,39 @@ export default function ProductsPage() {
           onChange={(e) => setSearch(e.target.value)}
         />
         <button
-          className="bg-green-600 text-white px-3 py-1 rounded"
+          className="bg-green-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-green-700 transition shadow-sm font-semibold"
           onClick={() => {
             setEditProduct(null);
             setModalOpen(true);
           }}
         >
+          <CloudArrowUpIcon className="w-5 h-5" />
           {t("pages.products.addProduct")}
         </button>
+        
         <button
-          className="bg-blue-600 text-white px-3 py-1 rounded"
+          className="bg-white border-2 border-slate-200 text-slate-700 px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-slate-50 transition shadow-sm font-semibold"
+          onClick={downloadTemplate}
+          title="Download Excel Template"
+        >
+          <TableCellsIcon className="w-5 h-5 text-blue-500" />
+          Template
+        </button>
+
+        <button
+          className="bg-white border-2 border-slate-200 text-slate-700 px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-slate-50 transition shadow-sm font-semibold"
+          onClick={exportProducts}
+          title="Export All Products"
+        >
+          <DocumentArrowDownIcon className="w-5 h-5 text-indigo-500" />
+          Export
+        </button>
+
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition shadow-sm font-semibold"
           onClick={uploadExcel}
         >
+          <CloudArrowUpIcon className="w-5 h-5" />
           {t("pages.products.bulkUpload")}
         </button>
         <input
@@ -161,12 +295,30 @@ export default function ProductsPage() {
           style={{ display: "none" }}
           onChange={handleBulkExcel}
         />
+
+        {userRole === 'super-admin' && selectedIds.length > 0 && (
+          <button
+            className="bg-red-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-red-700 transition shadow-sm font-semibold animate-in fade-in zoom-in duration-200"
+            onClick={handleBulkDelete}
+          >
+            <TrashIcon className="w-5 h-5" />
+            Delete ({selectedIds.length})
+          </button>
+        )}
       </div>
       {/* Table for desktop/tablet */}
       <div className="overflow-x-auto w-full hidden sm:block">
         <table className="w-full bg-white rounded-xl shadow-lg border border-slate-200 text-xs sm:text-sm md:text-base transition-all mb-8">
           <thead>
             <tr className="bg-slate-100 text-gray-700">
+              <th className="px-3 py-3 text-left w-10">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
+                  checked={filteredProducts.length > 0 && selectedIds.length === filteredProducts.length}
+                  onChange={toggleSelectAll}
+                />
+              </th>
               <th className="px-3 py-3 text-left min-w-[140px] font-semibold">
                 {t("pages.products.productName")}
               </th>
@@ -188,9 +340,17 @@ export default function ProductsPage() {
             {filteredProducts.map((prod) => (
               <tr
                 key={prod._id}
-                className="hover:bg-blue-50 transition-all border-t border-slate-100"
+                className={`hover:bg-blue-50 transition-all border-t border-slate-100 ${selectedIds.includes(prod._id) ? "bg-blue-50" : ""}`}
               >
-                <td className="px-3 py-3 break-words font-medium text-gray-900">
+                <td className="px-3 py-3">
+                  <input
+                    type="checkbox"
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+                    checked={selectedIds.includes(prod._id)}
+                    onChange={() => toggleSelect(prod._id)}
+                  />
+                </td>
+                <td className="px-3 py-3 break-words font-medium text-gray-900 cursor-pointer" onClick={() => toggleSelect(prod._id)}>
                   {prod.title}
                 </td>
                 <td className="px-3 py-3 break-words text-gray-500">
@@ -245,9 +405,17 @@ export default function ProductsPage() {
         {filteredProducts.map((prod) => (
           <div
             key={prod._id}
-            className="bg-white rounded-xl shadow p-4 border border-slate-200 flex flex-col"
+            className={`bg-white rounded-xl shadow p-4 border border-slate-200 flex flex-col relative transition-colors ${selectedIds.includes(prod._id) ? "border-blue-400 bg-blue-50" : ""}`}
           >
-            <div className="font-bold text-gray-900 mb-1">{prod.title}</div>
+            <div className="absolute top-4 right-4">
+               <input
+                type="checkbox"
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5 cursor-pointer"
+                checked={selectedIds.includes(prod._id)}
+                onChange={() => toggleSelect(prod._id)}
+              />
+            </div>
+            <div className="font-bold text-gray-900 mb-1 pr-8" onClick={() => toggleSelect(prod._id)}>{prod.title}</div>
             <div className="text-gray-500 mb-1">
               <span className="font-semibold">{t("pages.products.mobileCategory")}: </span>
               {prod.categorySlug}
